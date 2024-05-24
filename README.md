@@ -3,6 +3,7 @@ Thesis for MS at Trinity College Dublin. Aims at making a workflow for generatin
 
 - Checkpoint - https://civitai.com/models/16826/game-landscape-heightmap-genrator
 - LoRA (Low Rank Adaptation) - https://civitai.com/models/18621/game-landscape-heightmap-genrator-lora
+- SD API - https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API
 
 ## Tutorial
 The following tutorial by [freeCodeCamp](https://www.youtube.com/watch?v=dMkiOex_cKU) gives a good run-down about Stable Diffusion and it's use.
