@@ -1,0 +1,12 @@
+beautifulsoup4==4.12.3
+imageio==2.33.1
+jax==0.4.25
+opencv-contrib-python==4.8.1.78
+opencv-python==4.8.1.78
+Pillow==10.0.1
+requests==2.32.2
+selenium==4.21.0
+torch==2.1.2
+urllib3==2.2.1
+webdriver-manager==4.0.1
+bmi-topography==2.0.1
