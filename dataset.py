@@ -3,8 +3,7 @@ from bmi_topography.api_key import ApiKey
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import rasterio
-from rasterio.transform import from_origin
+from PIL import Image
 
 '''
 OpenTopography
@@ -39,6 +38,8 @@ class bmi_topography.Topography(dem_type=None,
                                 api_key=None)
 
 For more information, please visit the following link : https://pypi.org/project/bmi-topography/
+
+* Error: The maximum area for NASADEM is 450,000 km2. The selected area is 1,588,116 km2. Each patch/DEM has to be below this limit
 '''
 
 # Plot the extracted DEM using matplotlib
@@ -57,35 +58,33 @@ def saveDEM(patch, patchSize, patchIndex, longitude, latitude):
         method="linear"
     )
 
-    # Ensure data shape is compatible with rasterio (2D array)
-    data = da_resampled.values
+    # Ensure data shape is compatible with PIL
+    # Squeeze is used to remove extra dimensions
+    data = da_resampled.values.squeeze() 
 
-    # Save the resampled data to a GeoTIFF file
-    transform = from_origin(longitude, latitude + patchSize, (patch.da.x.max() - patch.da.x.min()) / 512, (patch.da.y.max() - patch.da.y.min()) / 512)
-    image = f'./images/patch_{patchIndex}.tif'
-
-    with rasterio.open(
-        image,
-        'w',
-        driver='GTiff',
-        height=data.shape[0],
-        width=data.shape[1],
-        count=1,
-        dtype=data.dtype,
-        crs='+proj=latlong',
-        transform=transform,
-    ) as dst:
-        dst.write(data, 1)
-
-    # Save metadata to a .txt file
-    metadata_content = "Himalaya, Mountain, Mount Everest, Mountain Range, Steep mountains, steep, erosion, rock, solid, cliffs, snowy"
-    metadata_file = f'./metadata/patch_{patchIndex}.txt'
-    
-    with open(metadata_file, 'w') as file:
-        file.write(metadata_content)
+    # Normalize the data for image representation
+    data_min = np.min(data)
+    data_max = np.max(data)
+    normalizedData = 255 * (data - data_min) / (data_max - data_min)
+    normalizedData = normalizedData.astype(np.uint8)
 
     ## Debugging
-    print(f"Saved image to {image} and metadata to {metadata_file}")
+    print(normalizedData, normalizedData.shape)
+
+    # Save the image using Pillow
+    image = Image.fromarray(normalizedData)
+    imgFile = f'./images/patch_{patchIndex}.png'  # or use .jpg for JPG format
+    image.save(imgFile)
+    
+    # Save metadata to a .txt file
+    metadataCount = "Himalaya, Mountain, Mount Everest, Mountain Range, Steep mountains, steep, erosion, rock, solid, cliffs, snowy"
+    metadataFile = f'./images/patch_{patchIndex}.txt'
+    
+    with open(metadataFile, 'w') as file:
+        file.write(metadataCount)
+
+    ## Debugging
+    print(f"Saved image to {imgFile} and metadata to {metadataFile}")
 
 def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBound = 85.0, saveImage = True, viewImage = False, isPatch = True, pSize = 0.5, outputFormat = 'GTiff', demType = 'NASADEM'):
     ## Accessing the API key defined globally
@@ -131,9 +130,9 @@ def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBou
                 patchParams = {
                     "dem_type" : demType,
                     "south" : latitude,
-                    "north" : latitude + patchSize,
+                    "north" : min(latitude + patchSize, northBound),
                     "west" : longitude,
-                    "east" : longitude + patchSize,
+                    "east" : min(longitude + patchSize, eastBound),
                     "output_format" : outputFormat,
                     "cache_dir" : './metadata'
                 }
@@ -155,11 +154,18 @@ def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBou
                     # Viewing the scraped data
                     if(viewImage):
                         title = f"Patch {patchIndex}"
+
+                        ## Debugging
+                        print(f"Showing image for ({latitude}, {longitude}) using {demType} as {title}")
+                        
                         displayDEM(patch, title)
 
                     # Resample the data to 512x512 pixels
                     # Saving the scarped data
                     if(saveImage):
+                        ## Debugging
+                        print(f"Saving image for ({latitude}, {longitude}) using {demType}")
+                        
                         saveDEM(patch, patchSize, patchIndex, longitude, latitude)
 
                 else:
@@ -196,11 +202,18 @@ def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBou
             # Viewing the scraped data
             if(viewImage):
                 title = f"({latitude}, {longitude})"
+                
+                ## Debugging
+                print(f"Showing image for ({latitude}, {longitude}) using {demType} as {title}")
+                
                 displayDEM(patch, title)
 
             # Resample the data to 512x512 pixels
             # Saving the scarped data
             if(saveImage):
+                ## Debugging
+                print(f"Saving image for ({latitude}, {longitude}) using {demType}")
+
                 saveDEM(patch, patchSize, patchIndex, longitude, latitude)
 
         else:
@@ -211,4 +224,4 @@ def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBou
 #                 East: 179.000138888889°     
 #                 West: -179.000138888889°
 # A higer patch size : 5, requires a lot of memory. 24 GB was not enough for this
-generateData(southBound = 26.0, northBound = 36.0, eastBound = 92.0, westBound = 77.0, saveImage=False, viewImage=True, isPatch=True, pSize=0.5)
+generateData(southBound = 26.0, northBound = 36.0, eastBound = 92.0, westBound = 77.0, saveImage=True, viewImage=False, isPatch=True, pSize=2.5)
