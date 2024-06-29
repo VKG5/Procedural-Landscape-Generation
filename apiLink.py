@@ -12,21 +12,25 @@ url = "http://127.0.0.1:7860/"
 # Payload is the prompt that will be passed to the server
 # You can have multiple options, which can be parsed in a JSON format
 ## *Refer to the following link for more details about the API : http://127.0.0.1:7860/docs/
+
+# The prompt start with the trigger word to make sure consistent results are produced
+prompt = "LandscapeAI"
+
 payload = {
     # Main Prompt
-    "prompt": "Alpen, super detail, (coastline:1.2)",
+    "prompt": prompt,
     "negative_prompt": "",
 
     # Steps and Batch properties
     "batch_size": 1,
-    "n_iter": 1,
-    "steps": 50,
+    "n_iter": 2,
+    "steps": 99,
     "cfg_scale": 7,
     "width": 512,
     "height": 512,
 
     # Hi-Resolution
-    "enable_hr": True,
+    "enable_hr": False,
     "hr_scale": 2,
     "hr_prompt": "",
     "hr_negative_prompt": "",

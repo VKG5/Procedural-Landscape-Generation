@@ -58,6 +58,9 @@ def saveDEM(patch, patchSize, patchIndex, longitude, latitude):
         method="linear"
     )
 
+    ## Debugging
+    print(f"Normalizing data for ({latitude}, {longitude})")
+
     # Ensure data shape is compatible with PIL
     # Squeeze is used to remove extra dimensions
     data = da_resampled.values.squeeze() 
@@ -84,7 +87,7 @@ def saveDEM(patch, patchSize, patchIndex, longitude, latitude):
         file.write(metadataCount)
 
     ## Debugging
-    print(f"Saved image to {imgFile} and metadata to {metadataFile}")
+    print(f"Saved image to {imgFile} and metadata to {metadataFile}\n")
 
 def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBound = 85.0, saveImage = True, viewImage = False, isPatch = True, pSize = 0.5, outputFormat = 'GTiff', demType = 'NASADEM'):
     ## Accessing the API key defined globally
