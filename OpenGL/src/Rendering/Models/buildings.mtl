@@ -1,0 +1,23 @@
+# Blender 3.6.1 MTL File: 'buildings.blend'
+# www.blender.org
+
+newmtl Building
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Building-Facade-Texture_03.jpg
+map_Ks Building_1_Spec.png
+map_Bump -bm 1.000000 Building1_Normal.png
+
+newmtl Top
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd concrete_layers_02_diff_1k.png
