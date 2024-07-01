@@ -29,21 +29,32 @@
 #include "Scene.h"
 
 // To force the use of dedicated GPU
+// #include <windows.h>
 // extern "C" {
+// __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 // __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 // }
+
+// TODO : If we are using the Nvidia GPU only, the triangles are not being rendered. Find out why!
+// DWORD is defined in this header file
+// If APIENTRY is already defined, undefine it to avoid macro redefinition warning (Usually defined in glad.h)
+/*
+#ifdef APIENTRY
+#undef APIENTRY
+#endif
+
+#include <windows.h>
+
+extern "C" {
+   __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+*/
 
 // Get the full path of the current source file
 const std::filesystem::path currentSourcePath = __FILE__;
 
 // Extract the directory containing the source file
 const std::filesystem::path currentSourceDir = currentSourcePath.parent_path();
-
-// Seed for Procedural Content
-GLuint seed = 165316;
-
-// Setting a random function to use
-std::mt19937 gen(seed);
 
 // Delta Time
 GLfloat deltaTime = 0.0f;
@@ -57,7 +68,7 @@ int main()
     mainWindow.initialize();
 
     // Our scene
-    Scene mainScene(mainWindow, seed);
+    Scene mainScene(mainWindow);
     mainScene.setupScene(currentSourceDir);
 
     // Main Loop - Running till the window is open=====================================================================

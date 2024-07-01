@@ -42,9 +42,6 @@
 // Skybox
 #include "Skybox.h"
 
-// Procedural Content Generation
-#include "randomDistribute.h"
-
 /*
 This class encapsulates all the elements in the viewport or scene. That includes the GUI layout, objects in the scene, Skyboxes,
 materials, cameras and anything that should be specific to the scene. Please modify as per required, making sure that the main
@@ -53,13 +50,6 @@ functionality is not altered. It is suggested to inherit this class and add furt
 class Scene {
 private:
     // Defining all necessary variables
-    // PCG variables
-    GLuint seed;
-    int gridSize = 20, pointSize = 2, numPoints = 20;
-    std::vector<std::pair<int, int>> randomPoints;
-    std::vector<glm::vec3> randomScales;
-    std::vector<int> randomHeights;
-
     // Setting the variables
     GLuint uniformProjection, uniformModel, uniformView, uniformEyePosition;
     GLuint uniformSpecularIntensity, uniformShininess, uniformMetalness;
@@ -147,7 +137,7 @@ private:
 
 public:
     // Constructor
-    Scene(Window& window, GLuint seed = 69420);
+    Scene(Window& window);
 
     // General Elements================================================================================================
     // Add a simple plane/floor
@@ -182,9 +172,6 @@ public:
 
     // Render Passes===================================================================================================
     // These include the elements that will be render in the scene, can define multiple ones
-    // Render a default PCG City/Whatever definition you have for the function
-    void renderPCGElements();
-
     // Render a custom scene with custom objects, lighting and different shading modes
     void renderScene();
 

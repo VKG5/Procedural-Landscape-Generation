@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 // Using initializer list since the type is primitive GLuint and we need the values initialized upon creation of the object
-Scene::Scene(Window& window, GLuint s)  :
+Scene::Scene(Window& window)  :
                 uniformProjection(0), uniformModel(0), uniformView(0), uniformEyePosition(0),
                 uniformSpecularIntensity(0), uniformShininess(0), uniformMetalness(0),
                 uniformshadingModel(0),
@@ -12,7 +12,7 @@ Scene::Scene(Window& window, GLuint s)  :
                 uniformEnvMapping(0), uniformSkybox(0), uniformBackgroundColor(0),
                 uniformIsReflection(0), uniformIsRefraction(0), uniformIOR(0), uniformFresnelReflectance(0), uniformDispersion(0),
                 uniformNormalStrength(0), uniformSpecularStrength(0),
-                mainWindow(window), seed(s) {
+                mainWindow(window) {
     // Initialize any resources here
     camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.125f, 3.0f);
 
@@ -21,11 +21,6 @@ Scene::Scene(Window& window, GLuint s)  :
 
     // ImGUI===========================================================================================================
     mainGUI.initialize(mainWindow.getWindow());
-
-    // Generating random points - Pre-Loading for faster rendering
-    generateRandomPoints(randomPoints, gridSize, pointSize, numPoints, seed);
-    generateRandomScales(randomScales, randomPoints.size(), seed);
-    generateRandomHeights(randomHeights, randomPoints.size(), seed);
 }
 
 void Scene::createPlane(const float floorSize, const float floorUV) {
@@ -215,10 +210,11 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
     // shader.setTexture(uniformNoiseTexture, 1);
 
     // Set the position of our moveable spot light w.r.t. the camera
-    // glm::vec3 lowerLight = camera.getCameraPosition();
-    // lowerLight.y -= 0.369f;
+    glm::vec3 lowerLight = camera.getCameraPosition();
+    lowerLight.y -= 0.369f;
+
     // Getting torch control
-    // spotLights[0].setFlash(lowerLight, camera.getCameraDirection());
+    spotLights[0].setFlash(lowerLight, camera.getCameraDirection());
 
     // Lights
     // Directional Light
@@ -303,98 +299,6 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
 float rotationAngle = 0.0f;
 float step = 0.05f;
 float size = 12.0f;
-
-// Contains a basic PCG Scene that can be rendered if enabled
-void Scene::renderPCGElements() {
-    // Objects=========================================================================================================
-    // Grounds
-    if(rotationAngle < 360.0f) {
-        rotationAngle += step;
-    }
-
-    else {
-        rotationAngle = 0.0f;
-    }
-
-    // Floor
-    glm::mat4 floor = glm::mat4(1.0f);
-
-    // TRS
-    // To rotate around origin
-    // floor = glm::rotate(floor, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    floor = glm::translate(floor, glm::vec3(mainGUI.getFloorOffset()[0],
-                                            mainGUI.getFloorOffset()[1],
-                                            mainGUI.getFloorOffset()[2]));
-    floor = glm::scale(floor, glm::vec3(mainGUI.getFloorScale()[0],
-                                        mainGUI.getFloorScale()[1],
-                                        mainGUI.getFloorScale()[2]));
-
-    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(floor));
-    brickTexture.useTexture();
-    roughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-
-    // Failsafe
-    if(meshList.size()) {
-        meshList[0]->renderMesh();
-    }
-
-    else {
-        createPlane();
-        meshList[0]->renderMesh();
-    }
-
-    // Buildings=======================================================================================================
-    // Randomly placing the buildings
-    for (size_t i=0; i < randomPoints.size(); i++) {
-        const auto& point = randomPoints[i];
-        const auto& scale = randomScales[i];
-        const auto& height = randomHeights[i];
-
-        for (int j = 0; j < height + 1; j++) {
-            float heightOffset = 0.0f;
-            // TODO : Optimize
-            if (point.first % 3 == 0) {
-                heightOffset = 2.64f;
-            }
-
-            else if (point.first % 3 == 1) {
-                heightOffset = 3.29f;
-            }
-
-            else {
-                continue;
-            }
-
-            glm::mat4 buil = glm::mat4(1.0f);
-            // Rotating so that it rotates along the origin then transalte and scale
-            // buil = glm::rotate(buil, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-
-            // TRS
-            buil = glm::translate(buil, glm::vec3(point.first, j * (heightOffset * scale.y), -point.second));
-            buil = glm::scale(buil, scale);
-
-            glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(buil));
-            roughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-
-            // Randomly pick a model
-            // int modelIndex = modelDistribution(gen);
-
-            // Determine which model to render based on some criteria (e.g., point coordinates)
-            if (point.first % 3 == 0) {
-                building0->renderModel();
-            }
-
-            else if (point.first % 3 == 1) {
-                building1->renderModel();
-            }
-
-            else {
-                continue;
-            }
-        }
-    }
-}
 
 void Scene::generalElements(glm::mat4& projectionMatrix, glm::mat4& viewMatrix) {
     // Clear window
@@ -567,110 +471,12 @@ void Scene::generalElements(glm::mat4& projectionMatrix, glm::mat4& viewMatrix) 
     else {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
-
-    // Updating the Procedural Content on button press
-    if(mainGUI.getUpdate()) {
-        // Debugging
-        // printf("In update!\n");
-        // printf("Grid : %i\nPoint : %i\nNum : %i\nSeed : %i\n",mainGUI.getGridSize(),
-        //                                                     mainGUI.getPointSize(),
-        //                                                     mainGUI.getNumPoints(),
-        //                                                     mainGUI.getSeed() );
-
-        generateRandomPoints(randomPoints,
-                             mainGUI.getGridSize(),
-                             mainGUI.getPointSize(),
-                             mainGUI.getNumPoints(),
-                             mainGUI.getSeed() );
-
-        generateRandomScales(randomScales, randomPoints.size(), seed);
-        generateRandomHeights(randomHeights, randomPoints.size(), seed);
-
-        // To prevent multiple clicking
-        mainGUI.setUpdate(false);
-    }
-}
-
-// Calculate Toed-in or Asymmetric Frustum Anaglyph
-void Scene::calculateAnaglyph(glm::mat4 & projectionMatrix, glm::mat4 & viewMatrix) {
-    /* Toed-In Method of Anaglyphical rendering
-    In this method, we change the view matrix to point towards a custom target and offset the
-    Render passes based off of the Inter Ocular Distance (IOD) and Convergence Distance (CD)
-    * Only works for perspective renders
-    */
-    //Red pass - Left Eye
-    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    // Checking for channel flip
-    bool leftEye = mainGUI.getIsAnaglyphChannelsFlippedToed() ? false : true;
-    bool rightEye = mainGUI.getIsAnaglyphChannelsFlippedFrustum() ? false : true;
-
-    if(mainGUI.getIsToedInRendering()) {
-        // Modifying the view matrix for left eye here
-        viewMatrix = camera.calculateViewMatrix(leftEye,
-                                                mainGUI.getInterOcularDistance(),
-                                                mainGUI.getCovergenceDistance());
-    }
-
-    else if(mainGUI.getIsAsymmetricFrustumRendering()) {
-        // Modifying the projection matrix for left eye here
-        projectionMatrix = camera.calculateAsymmetricFrustum(rightEye,
-                                                             mainGUI.getInterOcularDistance(),
-                                                             mainGUI.getCovergenceDistance(),
-                                                             mainWindow.getBufferWidth(),
-                                                             mainWindow.getBufferHeight());
-    }
-
-    // Setting Uniforms for a shader
-    getUniformsFromShader(shaderList[0]);
-    setUniformsForShader(projectionMatrix, viewMatrix, shaderList[0]);
-
-    // Rendering the scene
-    renderScene();
-
-    // Cyan pass - Right Eye
-    glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    if(mainGUI.getIsToedInRendering()) {
-        // Modifying the view matrix for right eye here
-        viewMatrix = camera.calculateViewMatrix(!leftEye,
-                                                mainGUI.getInterOcularDistance(),
-                                                mainGUI.getCovergenceDistance());
-    }
-
-    else if(mainGUI.getIsAsymmetricFrustumRendering()) {
-        // Modifying the projection matrix for right eye here
-        projectionMatrix = camera.calculateAsymmetricFrustum(!rightEye,
-                                                             mainGUI.getInterOcularDistance(),
-                                                             mainGUI.getCovergenceDistance(),
-                                                             mainWindow.getBufferWidth(),
-                                                             mainWindow.getBufferHeight());
-    }
-
-    // Setting Uniforms for a shader
-    getUniformsFromShader(shaderList[0]);
-    setUniformsForShader(projectionMatrix, viewMatrix, shaderList[0]);
-
-    // Rendering the scene
-    renderScene();
-
-    // Resetting the color pass to render all colors
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
 
 // Custom Scene definition is here!====================================================================================
 void Scene::loadObjects() {
     // Loading Models==================================================================================================
-    // Default PCG Models
-    building0 = new Model();
-    building0->loadModel("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Models/buildings.obj");
-
-    building1 = new Model();
-    building1->loadModel("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Models/buildings_2.obj");
-
     cube = new Model();
     cube->loadModel("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Models/cube.obj");
 
@@ -679,45 +485,39 @@ void Scene::loadObjects() {
 }
 
 void Scene::renderScene() {
-    // If we want to render PCG Elements
-    if(mainGUI.getIsPCG()) {
-        renderPCGElements();
+    if(rotationAngle < 360.0f) {
+        rotationAngle += step;
     }
 
     else {
-        if(rotationAngle < 360.0f) {
-            rotationAngle += step;
-        }
-
-        else {
-            rotationAngle = 0.0f;
-        }
-
-        glm::mat4 base = glm::mat4(1.0f);
-            // TRS
-            base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
-            base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-            base = glm::scale(base, glm::vec3(1.5f));
-            glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
-
-        monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
-        monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-        monkey->renderModel();
-
-        // Debugging
-        // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
-
-        cube->setInitialTransformMatrix();
-            // TRS
-            cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
-                                                            mainWindow.getYPos(),
-                                                            mainWindow.getBufferWidth(),
-                                                            mainWindow.getBufferHeight()) );
-        cube->updateTransform();
-
-        extraRoughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-        cube->renderModel(uniformModel);
+        rotationAngle = 0.0f;
     }
+
+    glm::mat4 base = glm::mat4(1.0f);
+        // TRS
+        base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
+        base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+        base = glm::scale(base, glm::vec3(1.5f));
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
+
+    monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
+    monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    monkey->renderModel();
+
+    // Debugging
+    // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+
+    // Debugging for Ray Castin using simple Ray OBB
+    // cube->setInitialTransformMatrix();
+    //     // TRS
+    //     cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
+    //                                                     mainWindow.getYPos(),
+    //                                                     mainWindow.getBufferWidth(),
+    //                                                     mainWindow.getBufferHeight()) );
+    // cube->updateTransform();
+
+    // extraRoughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    // cube->renderModel(uniformModel);
 }
 
 // Render Pass - Renders all data in the scene=========================================================================
@@ -734,19 +534,12 @@ void Scene::renderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
     // Always called
     generalElements(projectionMatrix, viewMatrix);
 
-    // Anaglyph Rendering
-    if(mainGUI.getIsAnaglyph()) {
-        calculateAnaglyph(projectionMatrix, viewMatrix);
-    }
+    // Setting Uniforms for a shader
+    getUniformsFromShader(shaderList[0]);
+    setUniformsForShader(projectionMatrix, viewMatrix, shaderList[0]);
 
-    else {
-        // Setting Uniforms for a shader
-        getUniformsFromShader(shaderList[0]);
-        setUniformsForShader(projectionMatrix, viewMatrix, shaderList[0]);
-
-        // Rendering the scene
-        renderScene();
-    }
+    // Rendering the scene
+    renderScene();
 
     // Drawing the UI
     setShadingModeName(mainGUI, shadingModel, shadingMode);

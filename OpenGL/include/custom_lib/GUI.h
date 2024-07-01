@@ -103,16 +103,6 @@ private:
     float animationRate = 0.005f;
     int interpolationType = 1;
 
-    // Procedural Content Generation
-    bool isPCG = false;
-    GLuint seed = 165316;
-    float floorOffset[3] = {0.0f, 0.0f, 0.0f};
-    float floorScale[3] = {2.5f, 1.0f, 2.5f};
-    GLuint gridSize = 20;
-    GLuint pointSize = 2;
-    GLuint numPoints = 20;
-    bool update = false;
-
 public:
     // Constructor
     GUI();
@@ -201,33 +191,8 @@ public:
     float getShininess() const  { return shininess; }
     float getMetalness() const { return metalness; }
 
-    // PCG
-    bool getIsPCG() const { return isPCG; }
-    GLuint getSeed() const { return seed; }
-    const float* getFloorOffset() const { return floorOffset; }
-    const float* getFloorScale() const { return floorScale; }
-    GLuint getGridSize() const { return gridSize; }
-    GLuint getPointSize() const { return pointSize; }
-    GLuint getNumPoints() const { return numPoints; }
-    bool getUpdate() const { return update; }
-
 
     // Project specific components=====================================================================================
-    // IK
-    bool getIsIK() const { return isIK; }
-    bool getIsTwoDIK() const { return isTwoDIK; }
-    bool getIsAnimate() const { return isAnimate; }
-    int getMaxIterations() const { return maxIterations; }
-    float getTolerance() const { return tolerance; }
-    float getEpsilon() const { return epsilon; }
-    int getChainLength() const { return chainLength; }
-    const float* getTargetLocation() const { return targetLocation; }
-    const float* getTargetEndLocation() const { return targetEndLocation; }
-    float getTargetSpeed() const { return targetSpeed; }
-    float getAnimationRate() const { return animationRate; }
-    int getInterpolationType() const { return interpolationType; }
-
-
     // Setters=========================================================================================================
     // Camera
     void setCameraIsPerspective(bool flag);
@@ -244,13 +209,7 @@ public:
     void setIsAnaglyphChannelsFlippedFrustum(bool flag);
 
     // IK
-    void setTargetLocation(float x, float y, float z);
     void setCameraPosition(float x, float y, float z);
-    void setIsAnimate(bool flag);
-    void setIsIK(bool flag);
-
-    // PCG - Setter to reset the button press value
-    void setUpdate(bool updateValue);
 
     // Destructor
     ~GUI();

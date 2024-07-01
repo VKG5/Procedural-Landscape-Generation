@@ -8,13 +8,11 @@ set(
     "GUI.cpp"
     "Model.cpp"
     "Scene.cpp"
-    "Picking.cpp"
 
     # External Dependencies
     "commons/deps/imgui_impl_glfw.cpp"
 
     # Custom Algorithms
-    "commons/algorithms/randomDistribute.cpp"
 
     # General - Sources that are common for all projects - MathFuncs.cpp, Camera.cpp, etc.
     "commons/Camera.cpp"
@@ -22,7 +20,6 @@ set(
     "commons/Light.cpp"
     "commons/Material.cpp"
     "commons/MathFuncs.cpp"
-    "commons/Movement.cpp"
     "commons/PointLight.cpp"
     "commons/Shader.cpp"
     "commons/Skybox.cpp"

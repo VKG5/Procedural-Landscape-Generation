@@ -5,7 +5,6 @@ set(
 set(
     LIBRARY_HEADERS
     "Mesh.h"
-    "Bones.h"
     "Shader.h"
     "Window.h"
     "Camera.h"
@@ -20,11 +19,8 @@ set(
     "SpotLight.h"
     "Model.h"
     "Skybox.h"
-    "Movement.h"
-    "algorithms/randomDistribute.h"
     "MathFuncs.h"
     "Scene.h"
-    "Picking.h"
 )
 
 set(
