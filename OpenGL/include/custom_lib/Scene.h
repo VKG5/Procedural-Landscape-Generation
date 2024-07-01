@@ -100,12 +100,6 @@ private:
     std::unique_ptr<Skybox> mainSkybox;
     std::vector<std::unique_ptr<Skybox>> skyboxList;
 
-    // Materials
-    Material shinyMat;
-    Material roughMat;
-    Material extraRoughMat;
-    Material extraShinyMat;
-
     // We have 4 shading models that can be iterated through
     // 1. Phong Illumination
     // 2. Blinn-Phong Illumination

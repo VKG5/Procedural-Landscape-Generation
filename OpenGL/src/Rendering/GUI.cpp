@@ -156,27 +156,6 @@ void GUI::elements(const std::string& shadingMode) {
                 ImGui::DragFloat("Rotation Speed", (float*)&cameraRotateSpeed, sliderSpeed);
             }
 
-            if(cameraIsPerspective) {
-                ImGui::Spacing();
-
-                // Increasing font size for heading
-                ImGui::SetWindowFontScale(1.15f);
-                ImGui::Text("Anaglyph Rendering");
-
-                // Resetting font size
-                ImGui::SetWindowFontScale(1.0f);
-                ImGui::Checkbox("Anaglyph", &isAnaglyph);
-
-                if(isAnaglyph) {
-                    ImGui::Checkbox("Toed-In", &isToedIn);
-                    ImGui::Checkbox("Asymmetric Frustum", &isAsymmetricFrustum);
-                    ImGui::Checkbox("Flip Channels (Toed)", &isFlipAnaglyphChannelsToed);
-                    ImGui::Checkbox("Flip Channels (Frustum)", &isFlipAnaglyphChannelsFrustum);
-                    ImGui::DragFloat("IoD (Eye Distance)", (float*)&interOcularDistance, sliderSpeed * 0.1);
-                    ImGui::DragFloat("CD (Convergence Distance)", (float*)&convergeDistance, sliderSpeed * 0.1);
-                }
-            }
-
             // End Current Tab Item
             ImGui::EndTabItem();
         }
@@ -241,26 +220,6 @@ void GUI::setCameraIsPerspective(bool flag) {
 
 void GUI::setCameraIsOrthographic(bool flag) {
     cameraIsOrthographic = flag;
-}
-
-void GUI::setIsAnaglyph(bool flag) {
-    isAnaglyph = flag;
-}
-
-void GUI::setIsToedInRendering(bool flag) {
-    isToedIn = flag;
-}
-
-void GUI::setIsAnaglyphChannelsFlippedToed(bool flag) {
-    isFlipAnaglyphChannelsToed = flag;
-}
-
-void GUI::setIsAnaglyphChannelsFlippedFrustum(bool flag) {
-    isFlipAnaglyphChannelsFrustum = flag;
-}
-
-void GUI::setIsAsymmetricFrustumRendering(bool flag) {
-    isAsymmetricFrustum = flag;
 }
 
 void GUI::setCameraFOV(float fieldOfView) {

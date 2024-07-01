@@ -151,15 +151,6 @@ public:
     float getCameraRotationRadius() const { return cameraRotateRadius; }
     float getCameraRotationSpeed() const { return cameraRotateSpeed; }
 
-    // Anaglyph
-    bool getIsAnaglyph() const { return isAnaglyph; }
-    bool getIsToedInRendering() const { return isToedIn; }
-    bool getIsAsymmetricFrustumRendering() const { return isAsymmetricFrustum; }
-    bool getIsAnaglyphChannelsFlippedToed() const { return isFlipAnaglyphChannelsToed; }
-    bool getIsAnaglyphChannelsFlippedFrustum() const  { return isFlipAnaglyphChannelsFrustum; }
-    float getInterOcularDistance() const { return interOcularDistance; }
-    float getCovergenceDistance() const { return convergeDistance; }
-
     // Directional Light Parameters
     const float* getDirectionalLightColor() const { return directionalLightColor; }
     const float* getDirectionalLightDirection() const { return directionalLightDirection; }
@@ -200,13 +191,6 @@ public:
     void setCameraFOV(float fieldOfView);
     void setCameraScale(float scale);
     void setCameraClipping(float near, float far);
-
-    // Anaglyph
-    void setIsAnaglyph(bool flag);
-    void setIsToedInRendering(bool flag);
-    void setIsAsymmetricFrustumRendering(bool flag);
-    void setIsAnaglyphChannelsFlippedToed(bool flag);
-    void setIsAnaglyphChannelsFlippedFrustum(bool flag);
 
     // IK
     void setCameraPosition(float x, float y, float z);

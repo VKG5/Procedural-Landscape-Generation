@@ -122,15 +122,6 @@ void Scene::createTextures() {
     // noiseTexture.generateRandomTexture(2048, 2048, 3);
 }
 
-void Scene::createMaterials() {
-    // Setting up Materials============================================================================================
-    // Make the second parameter (Shine) to be powers of 2
-    shinyMat = Material(1.0f, 256, 0.1f);
-    roughMat = Material(0.5f, 64, 0.8f);
-    extraRoughMat = Material(0.125f, 2, 1.0f);
-    extraShinyMat = Material(1.0f, 1024, 0.0125f);
-}
-
 void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
     // Create Shaders
     createShaders(currentSourceDir);
@@ -141,9 +132,7 @@ void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
     // Loading and creating Textures
     createTextures();
 
-    // Creating Materials
-    createMaterials();
-
+    // Creating Materials - Don't need this since we are having materials specific to each object and not specific to the scene
     // Loading and creating Objects/Models
     // The plane is necessary for PCG
     loadObjects();
@@ -349,55 +338,17 @@ void Scene::generalElements(glm::mat4& projectionMatrix, glm::mat4& viewMatrix) 
     if(mainWindow.getKeys()[GLFW_KEY_KP_5]) {
         if(mainGUI.getCameraIsPerspective()) {
             mainGUI.setCameraIsPerspective(false);
-
-            // Turn off Anaglyph for Orthographic view
-            mainGUI.setIsAnaglyph(false);
             mainGUI.setCameraIsOrthographic(true);
         }
 
         else {
             mainGUI.setCameraIsOrthographic(false);
-
-            // Turn off Anaglyph while switching back to Perspective
-            mainGUI.setIsAnaglyph(false);
             mainGUI.setCameraIsPerspective(true);
         }
 
         // Reset the rendering mode to Normal on each switch
         renderingMode = 0;
         mainWindow.getKeys()[GLFW_KEY_KP_5] = false;
-    }
-
-    // Setting Rendering Mode - 'M'
-    if(mainWindow.getKeys()[GLFW_KEY_M]) {
-        renderingMode = (renderingMode + 1) % 3;
-
-        // Debugging
-        // printf("%i", renderingMode);
-
-        // Default Rendering
-        if(renderingMode == 0) {
-            mainGUI.setIsAnaglyph(false);
-            mainGUI.setIsToedInRendering(false);
-            mainGUI.setIsAsymmetricFrustumRendering(false);
-        }
-
-        // Anaglyph - Toed-In Rendering
-        else if(renderingMode == 1) {
-            mainGUI.setIsAnaglyph(true);
-            mainGUI.setIsToedInRendering(true);
-            mainGUI.setIsAsymmetricFrustumRendering(false);
-        }
-
-        // Anaglyph - Asymmetric Frustum
-        else {
-            mainGUI.setIsAnaglyph(true);
-            mainGUI.setIsToedInRendering(false);
-            mainGUI.setIsAsymmetricFrustumRendering(true);
-        }
-
-        // Stopping multiple inputs from the same key
-        mainWindow.getKeys()[GLFW_KEY_M] = false;
     }
 
     // Switching to Perspective
