@@ -3,6 +3,8 @@
 // Always include GLFW after GLAD - Core Libraries
 #include <glad.h>
 
+#include <iostream>
+
 #include "Utilities.h"
 
 class Texture {
@@ -12,11 +14,7 @@ private:
 
     const char* filePath;
 
-    // Function to generate noise
-    unsigned char* generateNoise();
-
-    // Debugger
-    void printTextureInfo();
+    unsigned char* texData;
 
 public:
     // Constructor
@@ -33,8 +31,16 @@ public:
 
     void cleanTexture();
 
-    // Noise
-    bool generateRandomTexture(GLuint w, GLuint h, GLuint d);
+    // Debugger
+    void printTextureInfo() const;
+
+    void freeTextureData() const;
+
+    // Getters=========================================================================================================
+    int getHeight() const { return height; }
+    int getWidth() const { return width; }
+    int getBitDepth() const { return bitDepth; }
+    const unsigned char* getTexData() const { return texData; }
 
     // Destructor
     ~Texture();

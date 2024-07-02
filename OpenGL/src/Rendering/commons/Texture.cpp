@@ -16,15 +16,31 @@ Texture::Texture(const char* fileLoc) {
     filePath = fileLoc;
 }
 
-void Texture::printTextureInfo() {
-    printf("Texture ID : %i", textureID);
-    printf("Width, Height, Depth : (%i, %i)", width, height, bitDepth);
-    printf("File Path : %s", filePath);
+void Texture::printTextureInfo() const {
+    printf("Texture ID : %i\n", textureID);
+    printf("Width, Height, Depth : (%i, %i, %i)\n", width, height, bitDepth);
+    printf("File Path : %s\n", filePath);
+
+    if (texData) {
+        printf("Texture data is available\n");
+    }
+
+    else {
+        printf("No texture data available\n");
+    }
+}
+
+void Texture::freeTextureData() const {
+    // Debugging
+    // printf("Freeing texData: %p\n", (void*)texData);
+
+    // We have already copied the data to the buffers
+    stbi_image_free(texData);
 }
 
 // Load Textures based on channels
 bool Texture::loadTexture() {
-    unsigned char *texData = stbi_load(filePath, &width, &height, &bitDepth, 0);
+    texData = stbi_load(filePath, &width, &height, &bitDepth, 0);
     if(!texData) {
         printf("Failed to load: %s\n", filePath);
         return false;
@@ -63,14 +79,14 @@ bool Texture::loadTexture() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // We have already copied the data
-    stbi_image_free(texData);
+    // stbi_image_free(texData);
 
     return true;
 }
 
 // Choosing different types of loading
 bool Texture::loadTexture(int choice) {
-    unsigned char *texData = stbi_load(filePath, &width, &height, &bitDepth, 0);
+    texData = stbi_load(filePath, &width, &height, &bitDepth, 0);
     if(!texData) {
         printf("Failed to load: %s\n", filePath);
         return false;
@@ -147,59 +163,7 @@ bool Texture::loadTexture(int choice) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // We have already copied the data
-    stbi_image_free(texData);
-
-    return true;
-}
-
-unsigned char* Texture::generateNoise() {
-    // Assuming you want RGB values, adjust as needed
-    int channels = bitDepth;
-    unsigned char* texData = new unsigned char[width * height * channels];
-
-    for (int i = 0; i < width * height * channels; ++i) {
-        texData[i] = rand() % 256; // Generate random values between 0 and 255
-    }
-
-    return texData;
-}
-
-// Generating a random texture for use with roughness map
-bool Texture::generateRandomTexture(GLuint w, GLuint h, GLuint d) {
-    width = w;
-    height = h;
-    bitDepth = d;
-
-    unsigned char *texData = generateNoise();
-
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    // Setting parameter values
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // For zooming out - Minify
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    // For zooming in - Magnify
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Change the RGB type based off of your image
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Unbinding Texture
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // We have already copied the data
-    delete[] texData;
-
-    // Debugging
-    printf("Generated Noise Texture successfully!");
+    // stbi_image_free(texData);
 
     return true;
 }
@@ -219,8 +183,11 @@ void Texture::useTexture(int textureUnit) {
 }
 
 void Texture::cleanTexture() {
-    glDeleteTextures(1, &textureID);
-    textureID = 0;
+    if (textureID) {
+        glDeleteTextures(1, &textureID);
+        textureID = 0;
+    }
+
     width = 0;
     height = 0;
     bitDepth = 0;

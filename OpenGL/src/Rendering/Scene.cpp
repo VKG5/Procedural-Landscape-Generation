@@ -23,27 +23,84 @@ Scene::Scene(Window& window)  :
     mainGUI.initialize(mainWindow.getWindow());
 }
 
-void Scene::createPlane(const float floorSize, const float floorUV) {
-    // Floor indices
-    unsigned int indicesFloor[] = {
-        0, 1, 2,
-        1, 2, 3
-    };
+void Scene::createTerrain() {
+    trialTerrain = new Terrain(mainWindow, mainGUI);
 
-    // Floor vertices
-    GLfloat verticesFloor[] = {
-        // x, y, z                      u, v              Nx, Ny, Nz              Tx, Ty, Tz
-        -floorSize, 0.0f, -floorSize,   0.0f, 0.0f,       0.0f, -1.0f, 0.0f,      0.0f, 0.0f, 0.0f,
-        floorSize, 0.0f, -floorSize,    floorUV, 0.0f,    0.0f, -1.0f, 0.0f,      0.0f, 0.0f, 0.0f,
-        -floorSize, 0.0f, floorSize,    0.0f, floorUV,    0.0f, -1.0f, 0.0f,      0.0f, 0.0f, 0.0f,
-        floorSize, 0.0f, floorSize,     floorUV, floorUV, 0.0f, -1.0f, 0.0f,      0.0f, 0.0f, 0.0f
-    };
+    trialTerrain->createTerrainFromHeightmap("D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png");
 
-    Mesh* floor = new Mesh();
-    floor->createMesh(verticesFloor, indicesFloor, 44, 6);
+    // Debugging
+    // printHeightmapData( trialTerrain->getHeightmapTexture().getTexData(),
+    //                     trialTerrain->getHeightmapTexture().getWidth(),
+    //                     trialTerrain->getHeightmapTexture().getHeight() );
+
+    // // TODO : Calculate the vertices, UVs, etc.
+    // const float floorSize = 10.0f, floorUV = 5.0f;
+
+    // // Floor indices
+    // unsigned int indicesFloor[] = {
+    // };
+
+    // Generating the vertex array
+    int width = trialTerrain->getHeightmapTexture().getWidth();
+    int height = trialTerrain->getHeightmapTexture().getHeight();
+    int nChannels = trialTerrain->getHeightmapTexture().getBitDepth();
+    const unsigned char* data = trialTerrain->getHeightmapTexture().getTexData();
+
+    std::vector<float> vertices;
+
+    float yScale = 64.0f / 256.0f, yShift = 16.0f;
+
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            const unsigned char* texel = data + (j + width * i) * nChannels;
+            const unsigned char y = texel[0];
+
+            // Position - Vertex coordinates
+            float vx = -height / 2.0f + i;
+            float vy = static_cast<float>(y) * yScale - yShift;
+            float vz = -width / 2.0f + j;
+
+            // Texture Coordinates (u, v)
+            float u = static_cast<float>(j) / (width - 1);
+            float v = static_cast<float>(i) / (height - 1);
+
+            // Normal (Nx, Ny, Nz) - Assuming upward normals (simplified) [Reversed due to fragment shader code]
+            float Nx = 0.0f, Ny = -1.0f, Nz = 0.0f;
+
+            // Tangent (Tx, Ty, Tz) - Placeholder values
+            float Tx = 1.0f, Ty = 0.0f, Tz = 0.0f;
+
+            // Add all data for this vertex into the vector
+            vertices.insert(vertices.end(), {vx, vy, vz, u, v, Nx, Ny, Nz, Tx, Ty, Tz});
+        }
+    }
+
+    // Cleaning texture data from memory after creating vertex and index arrays
+    trialTerrain->getHeightmapTexture().freeTextureData();
+
+    // Convert vector to GLfloat array
+    GLfloat* vertexArray = new GLfloat[vertices.size()];
+    std::copy(vertices.begin(), vertices.end(), vertexArray);
+
+    // Generating indices for the landscape
+    std::vector<unsigned int> indices;
+    for(unsigned int i = 0; i < height-1; i++) {
+        for(unsigned int j = 0; j < width; j++) {
+            for(unsigned int k = 0; k < 2; k++) {
+                indices.push_back(j + width * (i + k));
+            }
+        }
+    }
+
+    // Now, convert vector to array
+    GLuint* indicesArray = new GLuint[indices.size()]; // Allocate memory for array
+    std::copy(indices.begin(), indices.end(), indicesArray); // Copy data to array
+
+    Mesh* terrain = new Mesh();
+    terrain->createMesh(vertexArray, indicesArray, vertices.size(), indices.size());
 
     // Adding to our meshlist
-    meshList.push_back(floor);
+    meshList.push_back(terrain);
 }
 
 void Scene::createShaders(const std::filesystem::path& currentSourceDir) {
@@ -113,13 +170,13 @@ void Scene::createTextures() {
     // 4. Intepolation and MIP Maps Interpolation
     whiteTexture = Texture("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Textures/Default/white.jpg");
     whiteTexture.loadTexture();
+
+    //* Removed the automatic deallocation of texture data memory, need to do it manually every time!
+    whiteTexture.freeTextureData();
+
     brickTexture = Texture("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Textures/Default/brickHi.png");
     brickTexture.loadTexture();
-
-    // Generated Noise Texture
-    // Parameters - Width, Height, Channels = 3 (Use 3 channels - RGB)
-    // noiseTexture = Texture();
-    // noiseTexture.generateRandomTexture(2048, 2048, 3);
+    brickTexture.freeTextureData();
 }
 
 void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
@@ -134,8 +191,9 @@ void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
 
     // Creating Materials - Don't need this since we are having materials specific to each object and not specific to the scene
     // Loading and creating Objects/Models
-    // The plane is necessary for PCG
+    // The plane is necessary for Terrain
     loadObjects();
+    createTerrain();
 }
 
 void Scene::getUniformsFromShader(Shader * shader) {
@@ -502,7 +560,6 @@ void Scene::update(float time) {
 
     // Handles the rendering of each elements - UI, GLFW, Objects, etc.
     renderPass(projection, camera.calculateViewMatrix());
-
 }
 
 Scene::~Scene() {

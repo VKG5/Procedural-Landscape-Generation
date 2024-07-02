@@ -21,6 +21,7 @@ set(
     "Skybox.h"
     "MathFuncs.h"
     "Scene.h"
+    "Terrain.h"
 )
 
 set(

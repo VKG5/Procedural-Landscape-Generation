@@ -104,3 +104,13 @@ std::string returnPath(const std::filesystem::path currentSourceDir, const std::
 
     return texturePath;
 }
+
+void printHeightmapData(const unsigned char* data, const int width, const int height) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            printf("%d ", static_cast<int>(data[y * width + x]));
+        }
+
+        printf("\n");
+    }
+}

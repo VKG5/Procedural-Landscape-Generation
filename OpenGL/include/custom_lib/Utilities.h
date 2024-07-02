@@ -1,6 +1,9 @@
 #ifndef COMMONVALS
 #define COMMONVALS
 
+// Basic IO libraries
+#include <iostream>
+
 // Always include GLFW after GLAD - Core Libraries
 #include <glad.h>
 
@@ -44,5 +47,8 @@ std::string removeBackslash(const char* str);
 
 // Compound path
 std::string returnPath(const std::filesystem::path currentSourceDir, const std::string fileName);
+
+// Printing data that is read from a heightmap
+void printHeightmapData(const unsigned char* data, const int width, const int height);
 
 #endif

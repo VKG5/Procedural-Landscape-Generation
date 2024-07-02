@@ -35,6 +35,7 @@
 #include "Utilities.h"
 #include "MathFuncs.h"
 #include "Material.h"
+#include "Terrain.h"
 
 // Custom Models
 #include "Model.h"
@@ -114,10 +115,11 @@ private:
     int renderingMode = 0;
 
     // Models
-    Model* building0;
-    Model* building1;
     Model* monkey;
     Model* cube;
+
+    // Terrains
+    Terrain* trialTerrain;
 
     // Camera Rotation
     float radius = 10.0f;
@@ -135,7 +137,7 @@ public:
 
     // General Elements================================================================================================
     // Add a simple plane/floor
-    void createPlane(const float floorSize = 5.0f, const float floorUV = 2.5f);
+    void createTerrain();
 
     // Creating and adding shaders to the scene
     void createShaders(const std::filesystem::path& currentSourceDir);
