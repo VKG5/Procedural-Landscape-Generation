@@ -33,13 +33,6 @@ void Scene::createTerrain() {
     //                     trialTerrain->getHeightmapTexture().getWidth(),
     //                     trialTerrain->getHeightmapTexture().getHeight() );
 
-    // // TODO : Calculate the vertices, UVs, etc.
-    // const float floorSize = 10.0f, floorUV = 5.0f;
-
-    // // Floor indices
-    // unsigned int indicesFloor[] = {
-    // };
-
     // Generating the vertex array
     int width = trialTerrain->getHeightmapTexture().getWidth();
     int height = trialTerrain->getHeightmapTexture().getHeight();
@@ -191,8 +184,9 @@ void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
 
     // Creating Materials - Don't need this since we are having materials specific to each object and not specific to the scene
     // Loading and creating Objects/Models
-    // The plane is necessary for Terrain
     loadObjects();
+
+    // Loading our terrain from a heightmap
     createTerrain();
 }
 
@@ -494,39 +488,49 @@ void Scene::loadObjects() {
 }
 
 void Scene::renderScene() {
-    if(rotationAngle < 360.0f) {
-        rotationAngle += step;
-    }
+    // if(rotationAngle < 360.0f) {
+    //     rotationAngle += step;
+    // }
 
-    else {
-        rotationAngle = 0.0f;
-    }
+    // else {
+    //     rotationAngle = 0.0f;
+    // }
 
-    glm::mat4 base = glm::mat4(1.0f);
-        // TRS
-        base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
-        base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-        base = glm::scale(base, glm::vec3(1.5f));
-        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
+    // glm::mat4 base = glm::mat4(1.0f);
+    //     // TRS
+    //     base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
+    //     base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+    //     base = glm::scale(base, glm::vec3(1.5f));
+    //     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
 
-    monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
-    monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-    monkey->renderModel();
+    // monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
+    // monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    // monkey->renderModel();
 
-    // Debugging
+    // Debugging - Used to show the position of cursor in 3D scene
     // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
 
     // Debugging for Ray Castin using simple Ray OBB
-    // cube->setInitialTransformMatrix();
-    //     // TRS
-    //     cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
-    //                                                     mainWindow.getYPos(),
-    //                                                     mainWindow.getBufferWidth(),
-    //                                                     mainWindow.getBufferHeight()) );
-    // cube->updateTransform();
+    cube->setInitialTransformMatrix();
+        // TRS
+        cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
+                                                        mainWindow.getYPos(),
+                                                        mainWindow.getBufferWidth(),
+                                                        mainWindow.getBufferHeight()) );
+    cube->updateTransform();
 
     // extraRoughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-    // cube->renderModel(uniformModel);
+    cube->renderModel(uniformModel);
+
+    // Failsafe
+    // TODO : FIX THE WEIRD RENDERING OF THE LANDSCAPE!
+    if(meshList.size()) {
+        meshList[0]->renderMesh();
+    }
+
+    else {
+        mainGUI.errorMessage("No valid terrain to render!");
+    }
 }
 
 // Render Pass - Renders all data in the scene=========================================================================
