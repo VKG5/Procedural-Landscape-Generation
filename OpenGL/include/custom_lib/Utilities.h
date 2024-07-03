@@ -51,4 +51,14 @@ std::string returnPath(const std::filesystem::path currentSourceDir, const std::
 // Printing data that is read from a heightmap
 void printHeightmapData(const unsigned char* data, const int width, const int height);
 
+// Template for printing a vector
+template<typename T>
+void printVector(std::vector<T> &arr) {
+    for (T& item : arr) {
+        std::cout << item << " ";
+    }
+
+    std::cout << std::endl;
+}
+
 #endif

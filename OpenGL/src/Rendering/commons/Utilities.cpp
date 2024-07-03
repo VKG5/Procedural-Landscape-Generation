@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Utilities.h"
 
 void calcAverageNormals( unsigned int* indices, unsigned int indexCount,

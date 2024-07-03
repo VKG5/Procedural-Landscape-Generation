@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Mesh.h"
 
 // Constructor
@@ -61,20 +59,71 @@ void Mesh::createMesh(GLfloat *vertices, unsigned int *indices, unsigned int num
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void Mesh::createMesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices, int height, int width) {
+    // Getting the number of indices
+    indexCount = indices.size();
+
+    // Creating and gettting the vertex ID of a VAO
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+        // Creating the Index Buffer Object
+        glGenBuffers(1, &IBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+
+            // Size of value we are passing in
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), &indices[0], GL_STATIC_DRAW);
+
+        // Creating the Index Buffer Object
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+            // STATIC DRAW - Not chaning the values in the array
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), &vertices[0], GL_STATIC_DRAW);
+
+            // Location = 0, the layout (location=0) id in the vertex shader
+            // Size = Number of elements in 1 row of the array
+            // Stride = How many values to skip from beginning
+            // Offset = Offset starting from beginning
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 11, 0);
+            glEnableVertexAttribArray(0);
+
+            // UV values - Texture
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 11, (void*)(sizeof(vertices[0]) * 3));
+            glEnableVertexAttribArray(1);
+
+            // Normals
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 11, (void*)(sizeof(vertices[0]) * 5));
+            glEnableVertexAttribArray(2);
+
+            // Tangents
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 11, (void*)(sizeof(vertices[0]) * 8));
+            glEnableVertexAttribArray(3);
+
+        // Un-Binding Buffer Array
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Un-Binding Vertex Array
+    glBindVertexArray(0);
+
+    // Un-Binding IBO/EBO after VAO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 void Mesh::renderMesh() {
     // Fail conditions
     if(!VAO) {
-        std::cout<<"VAO NOT DEFINED PROPERLY!";
+        printf("VAO NOT DEFINED PROPERLY!");
         return;
     }
 
     if(!VBO) {
-        std::cout<<"VBO NOT DEFINED PROPERLY!";
+        printf("VBO NOT DEFINED PROPERLY!");
         return;
     }
 
     if(!IBO) {
-        std::cout<<"IBO NOT DEFINED PROPERLY!";
+        printf("IBO NOT DEFINED PROPERLY!");
         return;
     }
 
@@ -85,6 +134,32 @@ void Mesh::renderMesh() {
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void Mesh::renderMesh(const int height, const int width) {
+    const unsigned int NUM_STRIPS = height-1;
+    const unsigned int NUM_VERTS_PER_STRIP = width*2;
+
+    // Draw Mesh
+    glBindVertexArray(VAO);
+
+    // Render the mesh triangle strip by triangle strip - each row at a time
+    for(unsigned int strip = 0; strip < NUM_STRIPS; ++strip) {
+        // Primitive Type
+        glDrawElements(GL_TRIANGLE_STRIP,
+                    // Number of indices to render
+                    NUM_VERTS_PER_STRIP,
+
+                    // Index data type
+                    GL_UNSIGNED_INT,
+
+                    // Offset to starting index
+                    (void*)(sizeof(unsigned int)
+                                * NUM_VERTS_PER_STRIP
+                                * strip));
+    }
+
     glBindVertexArray(0);
 }
 

@@ -39,7 +39,7 @@ void Scene::createTerrain() {
     int nChannels = trialTerrain->getHeightmapTexture().getBitDepth();
     const unsigned char* data = trialTerrain->getHeightmapTexture().getTexData();
 
-    std::vector<float> vertices;
+    std::vector<GLfloat> vertices;
 
     float yScale = 64.0f / 256.0f, yShift = 16.0f;
 
@@ -71,10 +71,6 @@ void Scene::createTerrain() {
     // Cleaning texture data from memory after creating vertex and index arrays
     trialTerrain->getHeightmapTexture().freeTextureData();
 
-    // Convert vector to GLfloat array
-    GLfloat* vertexArray = new GLfloat[vertices.size()];
-    std::copy(vertices.begin(), vertices.end(), vertexArray);
-
     // Generating indices for the landscape
     std::vector<unsigned int> indices;
     for(unsigned int i = 0; i < height-1; i++) {
@@ -85,12 +81,9 @@ void Scene::createTerrain() {
         }
     }
 
-    // Now, convert vector to array
-    GLuint* indicesArray = new GLuint[indices.size()]; // Allocate memory for array
-    std::copy(indices.begin(), indices.end(), indicesArray); // Copy data to array
-
+    // Creating the mesh from generated vertices
     Mesh* terrain = new Mesh();
-    terrain->createMesh(vertexArray, indicesArray, vertices.size(), indices.size());
+    terrain->createMesh(vertices, indices, trialTerrain->getHeightmapTexture().getHeight(), trialTerrain->getHeightmapTexture().getWidth());
 
     // Adding to our meshlist
     meshList.push_back(terrain);
@@ -508,7 +501,7 @@ void Scene::renderScene() {
     // monkey->renderModel();
 
     // Debugging - Used to show the position of cursor in 3D scene
-    // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+    ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
 
     // Debugging for Ray Castin using simple Ray OBB
     cube->setInitialTransformMatrix();
@@ -525,7 +518,8 @@ void Scene::renderScene() {
     // Failsafe
     // TODO : FIX THE WEIRD RENDERING OF THE LANDSCAPE!
     if(meshList.size()) {
-        meshList[0]->renderMesh();
+        mainGUI.warningMessage("Rendering Terrain!");
+        meshList[0]->renderMesh(trialTerrain->getHeightmapTexture().getHeight(), trialTerrain->getHeightmapTexture().getWidth());
     }
 
     else {
