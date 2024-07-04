@@ -94,15 +94,19 @@ void Scene::createShaders(const std::filesystem::path& currentSourceDir) {
     // Vertex Shader
     // Uniform - Global to shader, not associated with a particular vertex
     // Bind data to uniform to get location
-    std::string vertexShaderPath = returnPath(currentSourceDir, "Shaders/BRDF_Normals.vert");
+    std::string vertexShaderPath = returnPath(currentSourceDir, "Shaders/Terrain.vert");
     static const char* vertexShader = vertexShaderPath.c_str();
 
+    // Geometry Shader
+    std::string geometryShaderPath = returnPath(currentSourceDir, "Shaders/Terrain.geom");
+    static const char* geometryShader = geometryShaderPath.c_str();
+
     // Fragment Shader
-    std::string fragmentShaderPath = returnPath(currentSourceDir, "Shaders/BRDF_Normals.frag");
+    std::string fragmentShaderPath = returnPath(currentSourceDir, "Shaders/Terrain.frag");
     static const char* fragmentShader = fragmentShaderPath.c_str();
 
     Shader* shader1 = new Shader();
-    shader1->createFromFiles(vertexShader, fragmentShader);
+    shader1->createFromFiles(vertexShader, geometryShader, fragmentShader);
 
     shaderList.push_back(shader1);
 }
@@ -509,9 +513,9 @@ void Scene::renderScene() {
         mainGUI.errorMessage("No valid terrain to render!");
     }
 
-    // monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
-    // monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-    // monkey->renderModel();
+    monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
+    monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    monkey->renderModel();
 
     // Debugging - Used to show the position of cursor in 3D scene
     // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());

@@ -73,6 +73,7 @@ private:
            uniformNormalStrength, uniformSpecularStrength;
 
     void compileShader(const char* vertexCode, const char* fragmentCode);
+    void compileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
 
     void addShader(GLuint program, const char* shaderCode, GLenum shaderType);
 
@@ -84,6 +85,7 @@ public:
 
     void createFromString(const char* vertexCode, const char* fragmentCode);
     void createFromFiles(const char* vertexLocation, const char* fragmentLocation);
+    void createFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 
     void validate();
 

@@ -185,6 +185,22 @@ void Shader::compileShader(const char* vertexCode, const char* fragmentCode) {
     compileProgram();
 }
 
+void Shader::compileShader(const char *vertexCode, const char *geometryCode, const char *fragmentCode) {
+    // Creating the program to run the shaders on the GPU
+    shaderID = glCreateProgram();
+
+    if(!shaderID) {
+        std::cout<<"Error creating shader program";
+        return;
+    }
+
+    addShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+    addShader(shaderID, geometryCode, GL_GEOMETRY_SHADER);
+    addShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+
+    compileProgram();
+}
+
 void Shader::addShader(GLuint program, const char* shaderCode, GLenum shaderType) {
     // Creating an empty shader
     GLuint theShader = glCreateShader(shaderType);
@@ -220,6 +236,17 @@ void Shader::createFromFiles(const char* vertexLocation, const char* fragmentLoc
     const char* fragmentCode = fragmentString.c_str();
 
     compileShader(vertexCode, fragmentCode);
+}
+
+void Shader::createFromFiles(const char *vertexLocation, const char *geometryLocation, const char *fragmentLocation) {
+    std::string vertexString = readFile(vertexLocation);
+    std::string geometryString = readFile(geometryLocation);
+    std::string fragmentString = readFile(fragmentLocation);
+    const char* vertexCode = vertexString.c_str();
+    const char* geometryCode = geometryString.c_str();
+    const char* fragmentCode = fragmentString.c_str();
+
+    compileShader(vertexCode, geometryCode, fragmentCode);
 }
 
 std::string Shader::readFile(const char* filePath) {
