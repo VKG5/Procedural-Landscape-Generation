@@ -48,9 +48,9 @@ private:
     float cameraFOV = 45.0f;
     float cameraOrthoScale = 7.135f;
     float cameraNearClipping = 0.1f;
-    float cameraFarClipping = 100.0f;
-    float cameraSpeed = 5.0f;
-    float cameraPos[3] = {0.0f, 1.75f, 4.0f};
+    float cameraFarClipping = 1000.0f;
+    float cameraSpeed = 15.0f;
+    float cameraPos[3] = {465.0f, 218.2f, 465.0f};
     bool isCameraRotate = false;
     float cameraRotateRadius = 10.0f;
     float cameraRotateSpeed = 1.0f;

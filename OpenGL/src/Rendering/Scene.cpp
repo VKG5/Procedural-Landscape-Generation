@@ -489,34 +489,17 @@ void Scene::renderScene() {
     //     rotationAngle = 0.0f;
     // }
 
-    // glm::mat4 base = glm::mat4(1.0f);
-    //     // TRS
-    //     base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
-    //     base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-    //     base = glm::scale(base, glm::vec3(1.5f));
-    //     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
+    glm::mat4 base = glm::mat4(1.0f);
 
-    // monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
-    // monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-    // monkey->renderModel();
+    // // TRS
+    // base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
+    // base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+    // base = glm::scale(base, glm::vec3(1.5f));
 
-    // Debugging - Used to show the position of cursor in 3D scene
-    ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
-
-    // Debugging for Ray Castin using simple Ray OBB
-    cube->setInitialTransformMatrix();
-        // TRS
-        cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
-                                                        mainWindow.getYPos(),
-                                                        mainWindow.getBufferWidth(),
-                                                        mainWindow.getBufferHeight()) );
-    cube->updateTransform();
-
-    // extraRoughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
-    cube->renderModel(uniformModel);
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
+    whiteTexture.useTexture();
 
     // Failsafe
-    // TODO : FIX THE WEIRD RENDERING OF THE LANDSCAPE!
     if(meshList.size()) {
         mainGUI.warningMessage("Rendering Terrain!");
         meshList[0]->renderMesh(trialTerrain->getHeightmapTexture().getHeight(), trialTerrain->getHeightmapTexture().getWidth());
@@ -525,6 +508,25 @@ void Scene::renderScene() {
     else {
         mainGUI.errorMessage("No valid terrain to render!");
     }
+
+    // monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
+    // monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    // monkey->renderModel();
+
+    // Debugging - Used to show the position of cursor in 3D scene
+    // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+
+    // // Debugging for Ray Castin using simple Ray OBB
+    // cube->setInitialTransformMatrix();
+    //     // TRS
+    //     cube->updateTranslation( camera.getRayHitCoords(mainWindow.getXPos(),
+    //                                                     mainWindow.getYPos(),
+    //                                                     mainWindow.getBufferWidth(),
+    //                                                     mainWindow.getBufferHeight()) );
+    // cube->updateTransform();
+
+    // // extraRoughMat.useMaterial(uniformSpecularIntensity, uniformShininess, uniformMetalness);
+    // cube->renderModel(uniformModel);
 }
 
 // Render Pass - Renders all data in the scene=========================================================================
