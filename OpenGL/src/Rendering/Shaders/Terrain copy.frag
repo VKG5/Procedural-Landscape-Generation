@@ -1,0 +1,383 @@
+#version 460 core
+
+in vec4 geomCol;
+in vec2 geomTexCoord;
+in vec3 geomNormal;
+in vec3 geomFragPos;
+
+// For wireframe
+noperspective in vec3 edgeDistance;
+
+out vec4 outputColor;
+
+// Corrected Normal
+vec3 viewDir;
+float specularMapFactor;
+
+// Should be same as Utilities.h header file
+const int MAX_POINT_LIGHTS = 3;
+const int MAX_SPOT_LIGHTS = 3;
+
+struct Light {
+    vec3 colour;
+    float ambientIntensity;
+    float diffuseIntensity;
+};
+
+struct DirectionalLight {
+    Light base;
+    vec3 direction;
+};
+
+struct PointLight {
+    Light base;
+    vec3 position;
+    float constant;
+    float linear;
+    float exponent;
+};
+
+struct SpotLight {
+    PointLight base;
+    vec3 direction;
+    float edge;
+};
+
+struct Material {
+    float specularIntensity;
+    float shininess;
+    float metalness;
+};
+
+// Counter variables
+uniform int pointLightCount;
+uniform int spotLightCount;
+uniform int shadingModel;
+
+// Object Color
+uniform vec4 objectColor;
+uniform vec4 wireframeColor;
+
+// Material Preview Mode
+uniform bool materialPreview;
+uniform bool specularPreview;
+uniform bool normalPreview;
+
+// Wireframe or Shaded
+uniform bool isWireframe;
+uniform bool isShaded;
+
+// Lights
+uniform DirectionalLight directionalLight;
+uniform PointLight pointLight[MAX_POINT_LIGHTS];
+uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
+
+// Textures
+// Bound at Texture Unit 0
+uniform sampler2D diffuseMap;
+uniform sampler2D ambientOcclusionMap;
+
+// Texture Unit 1
+uniform sampler2D specularMap;
+
+// Texture Unit 2
+uniform sampler2D normalMap;
+
+// Bound at Texture Unit 1
+// uniform sampler2D noiseTexture;
+
+// Materials
+uniform Material material;
+
+// Eye Position
+uniform vec3 eyePosition;
+
+// Skybox
+uniform samplerCube environmentMap;
+uniform bool envMapping;
+uniform bool skybox;
+uniform vec3 backgroundColor;
+
+// Transmission
+uniform bool reflection;
+uniform bool refraction;
+uniform float ior;
+uniform float reflectance;
+uniform float dispersion;
+uniform float normalStrength;
+uniform float specularStrength;
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec4 calcLightByDirection(Light light, vec3 direction) {
+    // Ambient Light
+    vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
+
+    // Diffuse Light
+    // Getting the cosine of angle between two vectors
+    float diffuseFactor = max(dot(normalize(normalTBN), normalize(direction)), 0.0);
+    vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity * diffuseFactor, 1.0);
+
+    // Specular Light
+    vec4 specularColour = vec4(0, 0, 0, 0);
+
+    // If no diffuse, then no specular
+    if(diffuseFactor > 0.0) {
+        float specularFactor = 0.0;
+
+        // Phong-Blinn Illumination
+        if(shadingModel == 1) {
+            // Calculating Halfway Direction for Phong-Blinn Model
+            vec3 fragToLight = normalize(direction);
+            vec3 fragToEye = viewDir;
+            vec3 halfwayDir = normalize(fragToLight + fragToEye);
+
+            specularFactor = max(dot(halfwayDir, normalize(normalTBN)), 0.0);
+        }
+
+        // Phong Illumination
+        else if (shadingModel == 0) {
+            vec3 fragToEye = geomTBNMatrix * normalize(eyePosition - geomFragPos);
+            vec3 reflectedVertex = normalize(reflect(direction, normalize(normalTBN)));
+
+            specularFactor = dot(fragToEye, reflectedVertex);
+        }
+
+        else {
+            specularFactor = 0.0;
+        }
+
+        // Clamping and specular highlights
+        if (specularFactor > 0.0) {
+            specularFactor = pow(specularFactor, material.shininess);
+
+            if(isShaded) {
+                specularColour = vec4((light.colour * material.specularIntensity * specularMapFactor * specularFactor), 1.0);
+            }
+
+            else {
+                specularColour = vec4((light.colour * material.specularIntensity * specularFactor), 1.0);
+            }
+        }
+    }
+
+    if(envMapping) {
+        if(skybox) {
+            // Setting up empty environment color
+            vec3 envColor = vec3(0.0, 0.0, 0.0);
+
+            // Reflection
+            if(reflection && !refraction) {
+                envColor = calcReflection();
+            }
+
+            // Refraction
+            else if (!reflection && refraction) {
+                envColor = calcRefraction();
+            }
+
+            // Fresnel
+            else if (reflection && refraction) {
+                vec3 incident = -viewDir;
+                vec3 normal = -normalize(normalTBN);
+
+                float cosTheta = dot(incident, normal);
+                float sinTheta2 = 1.0 - cosTheta * cosTheta;
+
+                if(sinTheta2 < 0.0) {
+                    envColor = objectColor.rgb;
+                }
+
+                else {
+                    vec3 F0 = vec3(reflectance);
+                    F0 = mix(F0, objectColor.rgb, material.metalness);
+
+                    // Calculate fresnel reflection using Schlick's approximation
+                    vec3 fresenelFactor = fresnelSchlick(cosTheta, F0);
+                    envColor = mix( calcRefraction(), calcReflection(), fresenelFactor );
+                }
+            }
+
+            // Combine diffuse and specular with environment reflection
+            // return (ambientColour + diffuseColour + specularColour);
+            // Also using the specular map if shaded
+            if(isShaded) {
+                return  ( ambientColour + diffuseColour ) +
+                          specularColour * (1.0 - material.metalness) +
+                          vec4(envColor * (1.0 - material.metalness) * material.specularIntensity * specularMapFactor, 1.0 );
+            }
+
+            else {
+                return  ( ambientColour + diffuseColour ) +
+                          specularColour * (1.0 - material.metalness) +
+                          vec4(envColor * (1.0 - material.metalness) * material.specularIntensity, 1.0 );
+            }
+        }
+
+        else {
+            // Combine diffuse and specular with background color
+            if(isShaded) {
+                return  ( ambientColour + diffuseColour ) +
+                          specularColour * (1.0 - material.metalness) +
+                          vec4(backgroundColor * (1.0 - material.metalness) * material.specularIntensity * specularMapFactor, 1.0 );
+            }
+
+            else {
+                return  ( ambientColour + diffuseColour ) +
+                          specularColour * (1.0 - material.metalness) +
+                          vec4(backgroundColor * (1.0 - material.metalness) * material.specularIntensity, 1.0 );
+            }
+        }
+    }
+
+    else {
+        return (ambientColour + diffuseColour + specularColour);
+    }
+}
+
+vec4 calcDirectionalLight() {
+    return calcLightByDirection(directionalLight.base, directionalLight.direction);
+}
+
+vec4 calcPointLightsBase(PointLight pLight) {
+    // Calculating Direction of our Point Lights
+    // Getting direction from light to fragment
+    vec3 direction = geomFragPos - pLight.position;
+    float distance = length(direction);
+
+    direction = geomTBNMatrix * normalize(direction);
+
+    vec4 colour = calcLightByDirection(pLight.base, direction);
+
+    float attenuation = pLight.exponent * distance * distance +
+                        pLight.linear * distance +
+                        pLight.constant;
+
+    return (colour / attenuation);
+}
+
+vec4 calcSpotLightsBase(SpotLight sLight) {
+    // Getting Direction
+    vec3 rayDirection = geomTBNMatrix * normalize(geomFragPos - sLight.base.position);
+	float slFactor = dot(rayDirection, normalize(sLight.direction));
+    vec4 colour = vec4(0, 0, 0, 0);
+
+    // If we are withing range
+    if(slFactor > sLight.edge) {
+        colour = calcPointLightsBase(sLight.base);
+        if(colour != vec4(0, 0, 0, 0)) {
+            colour *= (1.0 - (1.0 - slFactor) * (1.0/(1.0 - sLight.edge)));
+        }
+    }
+
+    return colour;
+}
+
+vec4 calcPointLights() {
+    vec4 totalColour = vec4(0, 0, 0, 0);
+
+    for(int i = 0; i < pointLightCount; i++) {
+        totalColour += calcPointLightsBase(pointLight[i]);
+    }
+
+    return totalColour;
+}
+
+vec4 calcSpotLights() {
+    vec4 totalColour = vec4(0, 0, 0, 0);
+
+    for(int i = 0; i < spotLightCount; i++) {
+        totalColour += calcSpotLightsBase(spotLight[i]);
+    }
+
+    return totalColour;
+}
+
+void main() {
+    // Setting specular map strength - Blending between actual map and white
+    specularMapFactor = mix(vec3(1.0, 1.0, 1.0).r, texture(specularMap, geomTexCoord).r, specularStrength);
+
+    // Calculating View Position
+    viewDir = geomTBNMatrix * normalize(geomFragPos - eyePosition);
+
+    // If we just want to view the textures
+    if(materialPreview) {
+        if(isShaded) {
+            if(specularPreview) {
+                outputColor = texture(specularMap, geomTexCoord);
+            }
+
+            else if(normalPreview) {
+                outputColor = texture(normalMap, geomTexCoord);
+            }
+
+            else {
+                outputColor = texture(diffuseMap, geomTexCoord);
+            }
+        }
+
+        else
+            outputColor = objectColor;
+    }
+
+    // If we are not in the wireframe mode
+    // And the texture are enabled
+    else if(!isWireframe && isShaded) {
+        vec4 finalColour = vec4(1.0, 1.0, 1.0, 1.0);
+
+        if(shadingModel < 2) {
+            finalColour = calcDirectionalLight();
+            finalColour += calcPointLights();
+            finalColour += calcSpotLights();
+        }
+
+        outputColor = texture(diffuseMap, geomTexCoord) * finalColour;
+    }
+
+    // If we are not in the wireframe mode
+    // And textures are disabled
+    else if(!isWireframe && !isShaded) {
+        normalTBN = geomNormal;
+        vec4 finalColour = vec4(1.0, 1.0, 1.0, 1.0);
+
+        if(shadingModel < 2) {
+            finalColour = calcDirectionalLight();
+            finalColour += calcPointLights();
+            finalColour += calcSpotLights();
+        }
+
+        outputColor = objectColor * finalColour;
+    }
+
+    // If we are in wireframe mode
+    else if(isWireframe) {
+        outputColor = wireframeColor;
+    }
+
+    else {
+        outputColor = objectColor;
+    }
+
+    // Rendering the wireframe
+    float wireframeWidth = 2.0;
+    float d = min (edgeDistance.x, min(edgeDistance.y, edgeDistance.z));
+
+    float mixVal = 0.0;
+    if(d < wireframeWidth - 1) {
+        mixVal = 1.0;
+    }
+
+    else if(d > wireframeWidth + 1) {
+        mixVal = 0.0;
+    }
+
+    else {
+        float x = d - (wireframeWidth - 1);
+        mixVal = exp2(-2.0 * x * x);
+    }
+
+    // Example simple fragment shader
+    outputColor = mix(outputColor, wireframeColor, mixVal);
+}

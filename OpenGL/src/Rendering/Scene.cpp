@@ -517,7 +517,7 @@ void Scene::renderScene() {
     monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
     monkey->renderModel();
 
-    // Debugging - Used to show the position of cursor in 3D scene
+    // // Debugging - Used to show the position of cursor in 3D scene
     // ImGui::Text("%i, %i", mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
 
     // // Debugging for Ray Castin using simple Ray OBB
