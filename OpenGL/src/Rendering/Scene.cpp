@@ -43,28 +43,40 @@ void Scene::createTerrain() {
 
     float yScale = 64.0f / 256.0f, yShift = 16.0f;
 
+
+    // Using a lambda to get the height at a specific grid point
+    auto getHeight = [&](int x, int z) -> float {
+        if (x < 0 || x >= height || z < 0 || z >= width) return 0.0f;
+        const unsigned char* texel = data + (z + width * x) * nChannels;
+        return static_cast<float>(texel[0]) * yScale - yShift;
+    };
+
     for (unsigned int i = 0; i < height; i++) {
         for (unsigned int j = 0; j < width; j++) {
-            const unsigned char* texel = data + (j + width * i) * nChannels;
-            const unsigned char y = texel[0];
-
-            // Position - Vertex coordinates
             float vx = -height / 2.0f + i;
-            float vy = static_cast<float>(y) * yScale - yShift;
+            float vy = getHeight(i, j);
             float vz = -width / 2.0f + j;
 
-            // Texture Coordinates (u, v)
             float u = static_cast<float>(j) / (width - 1);
             float v = static_cast<float>(i) / (height - 1);
 
-            // Normal (Nx, Ny, Nz) - Assuming upward normals (simplified) [Reversed due to fragment shader code]
-            float Nx = 0.0f, Ny = -1.0f, Nz = 0.0f;
+            // Calculate normals using central difference
+            float leftHeight = getHeight(i - 1, j);
+            float rightHeight = getHeight(i + 1, j);
+            float downHeight = getHeight(i, j - 1);
+            float upHeight = getHeight(i, j + 1);
 
-            // Tangent (Tx, Ty, Tz) - Placeholder values
+            glm::vec3 left(-1.0f, leftHeight - vy, 0.0f);
+            glm::vec3 right(1.0f, rightHeight - vy, 0.0f);
+            glm::vec3 down(0.0f, downHeight - vy, -1.0f);
+            glm::vec3 up(0.0f, upHeight - vy, 1.0f);
+
+            glm::vec3 normal = glm::normalize(cross(up, right) + glm::cross(right, down) + glm::cross(down, left) + glm::cross(left, up));
+
             float Tx = 1.0f, Ty = 0.0f, Tz = 0.0f;
 
             // Add all data for this vertex into the vector
-            vertices.insert(vertices.end(), {vx, vy, vz, u, v, Nx, Ny, Nz, Tx, Ty, Tz});
+            vertices.insert(vertices.end(), {vx, vy, vz, u, v, normal.x, normal.y, normal.z, Tx, Ty, Tz});
         }
     }
 

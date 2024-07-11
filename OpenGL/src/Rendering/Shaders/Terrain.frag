@@ -59,11 +59,17 @@ uniform vec4 wireframeColor;
 uniform bool isWireframe;
 uniform bool isShaded;
 
+// Materials
+uniform Material material;
+
+// Eye Position
+uniform vec3 eyePosition;
+
 
 // Instantiating Lights================================================================================================
 uniform DirectionalLight directionalLight;
-// uniform PointLight pointLight[MAX_POINT_LIGHTS];
-// uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
+uniform PointLight pointLight[MAX_POINT_LIGHTS];
+uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
 
 
 // Instantiating Textures==============================================================================================
@@ -89,7 +95,31 @@ vec4 calcLightByDirection(Light light, vec3 direction) {
     // Specular Light
     vec4 specularColour = vec4(0, 0, 0, 0);
 
-    return (ambientColour + diffuseColour);
+    if(diffuseFactor > 0.0) {
+        float specularFactor = 0.0;
+
+        // Calculating Halfway Direction for Phong-Blinn Model
+        vec3 fragToLight = normalize(direction);
+        vec3 fragToEye = normalize(eyePosition - geomFragPos);
+        vec3 halfwayDir = normalize(fragToLight + fragToEye);
+
+        specularFactor = max(dot(halfwayDir, normalize(geomNormal)), 0.0);
+
+        // Clamping and specular highlights
+        if (specularFactor > 0.0) {
+            specularFactor = pow(specularFactor, material.shininess);
+
+            // if(isShaded) {
+            //     specularColour = vec4((light.colour * material.specularIntensity * specularFactor), 1.0);
+            // }
+
+            // else {
+            specularColour = vec4((light.colour * material.specularIntensity * specularFactor), 1.0);
+            // }
+        }
+    }
+
+    return (ambientColour + diffuseColour + specularColour);
 }
 
 vec4 calcDirectionalLight() {
