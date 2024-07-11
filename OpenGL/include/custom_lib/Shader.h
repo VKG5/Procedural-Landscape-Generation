@@ -126,15 +126,6 @@ public:
     GLuint getSpecularPreviewLocation();
     GLuint getNormalPreviewLocation();
 
-    // Material properties
-    GLuint getIsReflectionLocation();
-    GLuint getIsRefractionLocation();
-    GLuint getIORLocation();
-    GLuint getFresnelReflectance();
-    GLuint getDispersionLocation();
-    GLuint getNormalStrengthLocation();
-    GLuint getSpecularStrengthLocation();
-
     // Shader ID
     GLuint getShaderIDLocation();
 

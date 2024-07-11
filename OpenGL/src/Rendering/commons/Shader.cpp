@@ -92,17 +92,11 @@ void Shader::compileProgram() {
 
     // Textures
     uniformDiffuseTexture = glGetUniformLocation(shaderID, "diffuseMap");
-    uniformAmbientOcclusionTexture = glGetUniformLocation(shaderID, "ambientOcclusionMap");
-    uniformSpecularTexture = glGetUniformLocation(shaderID, "specularMap");
-    uniformNormalTexture = glGetUniformLocation(shaderID, "normalMap");
-    uniformNoiseTexture = glGetUniformLocation(shaderID, "noiseTexture");
 
     // Material Properties
     uniformShininess = glGetUniformLocation(shaderID, "material.shininess");
     uniformSpecularIntensity = glGetUniformLocation(shaderID, "material.specularIntensity");
     uniformMetalness = glGetUniformLocation(shaderID, "material.metalness");
-    uniformNormalStrength = glGetUniformLocation(shaderID, "normalStrength");
-    uniformSpecularStrength = glGetUniformLocation(shaderID, "specularStrength");
 
     // Specular Highlights
     uniformEyePosition = glGetUniformLocation(shaderID, "eyePosition");
@@ -392,35 +386,6 @@ GLuint Shader::getSkyboxLocation() {
 
 GLuint Shader::getBackgroundColourLocation() {
     return uniformBackgroundColor;
-}
-
-// Material Paramters
-GLuint Shader::getIsReflectionLocation() {
-    return uniformIsReflection;
-}
-
-GLuint Shader::getIsRefractionLocation() {
-    return uniformIsRefraction;
-}
-
-GLuint Shader::getIORLocation() {
-    return uniformIOR;
-}
-
-GLuint Shader::getFresnelReflectance() {
-    return uniformFresnelReflectance;
-}
-
-GLuint Shader::getDispersionLocation() {
-    return uniformDispersion;
-}
-
-GLuint Shader::getNormalStrengthLocation() {
-    return uniformNormalStrength;
-}
-
-GLuint Shader::getSpecularStrengthLocation() {
-    return uniformSpecularStrength;
 }
 
 // Getting the shader ID===============================================================================================

@@ -35,7 +35,7 @@ private:
     // Light settings
     // Directional Light
     float directionalLightColor[3] = {1.0f, 1.0f, 1.0f};
-    float directionalLightDirection[3] = {2.0f, -1.0f, -2.0f};
+    float directionalLightDirection[3] = {2.0f, 1.0f, -2.0f};
     float directionalLightAmbient = 0.350f;
     float directionalLightDiffuse = 0.500f;
 
@@ -48,7 +48,7 @@ private:
     float cameraFOV = 45.0f;
     float cameraOrthoScale = 7.135f;
     float cameraNearClipping = 0.1f;
-    float cameraFarClipping = 1000.0f;
+    float cameraFarClipping = 1500.0f;
     float cameraSpeed = 15.0f;
     float cameraPos[3] = {465.0f, 218.2f, 465.0f};
     bool isCameraRotate = false;
@@ -89,20 +89,6 @@ private:
     float shininess = 256.0f;
     float metalness = 0.5f;
 
-    // IK Controls
-    bool isIK = false;
-    bool isTwoDIK = true;
-    bool isAnimate = false;
-    int chainLength = 2;
-    int maxIterations = 1024;
-    float tolerance = 1.0f;
-    float epsilon = 0.01f;
-    float targetLocation[3] = {0.0f, 3.5f, 0.0f};
-    float targetEndLocation[3] = {1.0f, 0.75f, 2.5f};
-    float targetSpeed = 0.005f;
-    float animationRate = 0.005f;
-    int interpolationType = 1;
-
 public:
     // Constructor
     GUI();
@@ -134,8 +120,6 @@ public:
 
     // Material Preview Mode
     bool getMaterialPreview() const { return materialPreview; }
-    bool getSpecularPreview() const { return specularPreview; }
-    bool getNormalPreview() const { return normalPreview; }
 
     // Camera
     int getSkyboxIndex() const { return skyboxIndex; }
@@ -157,25 +141,9 @@ public:
     float getDirectionalLightAmbient() const { return directionalLightAmbient; }
     float getDirectionalLightDiffuse() const { return directionalLightDiffuse; }
 
-    // Point Light Parameters
-    bool getIsPointLights() const { return isPointLights; }
-
-    // Spot Light Parameters
-    bool getIsSpotLights() const { return isSpotLights; }
-
     // Skybox Parameters
     bool getIsSkyBox() const { return isSkyBox; }
     bool getDrawSkyBox() const { return drawSkybox; }
-
-    // Environment Mapping Parameters - Material Properties
-    bool getIsEnvMapping() const { return isEnvMapping; }
-    bool getIsReflection() const { return isReflection; }
-    bool getIsRefraction() const { return isRefraction; }
-    float getIOR() const { return ior; }
-    float getFresnelReflectance() const { return f0; }
-    float getDispersion() const { return dispersion; }
-    float getNormalStrength() const { return normalStrength; }
-    float getSpecularStrength() const { return specularSrength; }
 
     // Materials
     float getSpecular() const { return specular; }

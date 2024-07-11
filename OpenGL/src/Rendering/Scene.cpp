@@ -233,20 +233,8 @@ void Scene::getUniformsFromShader(Shader * shader) {
     uniformSpecularPreview = shader->getSpecularPreviewLocation();
     uniformNormalPreview = shader->getNormalPreviewLocation();
 
-    // Material Properties
-    uniformIsReflection = shader->getIsReflectionLocation();
-    uniformIsRefraction = shader->getIsRefractionLocation();
-    uniformIOR = shader->getIORLocation();
-    uniformFresnelReflectance = shader->getFresnelReflectance();
-    uniformDispersion = shader->getDispersionLocation();
-    uniformNormalStrength = shader->getNormalStrengthLocation();
-    uniformSpecularStrength = shader->getSpecularStrengthLocation();
-
     // Texture
     uniformDiffuseTexture = shader->getMainTextureLocation();
-    uniformSpecularTexture = shader->getSpecularTextureLocation();
-    uniformAmbientOcclusionTexture = shader->getAmbientOcclusionTextureLocation();
-    uniformNormalTexture = shader->getNormalTextureLocation();
 }
 
 void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, Shader * shader) {
@@ -279,25 +267,6 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
 
     shader->setDirectionalLight(&mainLight);
 
-    // Currently disabling the Point and Spot lights based off a boolean
-    // Point Lights
-    if(mainGUI.getIsPointLights()) {
-        shader->setPointLight(pointLights, pointLightCount);
-    }
-
-    else {
-        shader->setPointLight(pointLights, 0);
-    }
-
-    // Spot Lights
-    if(mainGUI.getIsSpotLights()) {
-        shader->setSpotLight(spotLights, spotLightCount);
-    }
-
-    else {
-        shader->setSpotLight(spotLights, 0);
-    }
-
     // Binding to uniforms in the shader
     glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -311,8 +280,6 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
     // Setting the triggers from UI Elements
     // Material Preview
     glUniform1i(uniformMaterialPreview, mainGUI.getMaterialPreview());
-    glUniform1i(uniformSpecularPreview, mainGUI.getSpecularPreview());
-    glUniform1i(uniformNormalPreview, mainGUI.getNormalPreview());
 
     // Object Properties
     glUniform1i(uniformIsWireframe, mainGUI.getIsWireframe());
@@ -328,20 +295,10 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
                                        mainGUI.getWireframeColor().z,
                                        mainGUI.getWireframeColor().w );
 
-    glUniform1i(uniformEnvMapping, mainGUI.getIsEnvMapping());
     glUniform1i(uniformSkybox, mainGUI.getIsSkyBox());
     glUniform3f(uniformBackgroundColor, mainGUI.getBackgroundColor().x,
                                         mainGUI.getBackgroundColor().y,
                                         mainGUI.getBackgroundColor().z);
-
-    // Material Properties
-    glUniform1i(uniformIsReflection, mainGUI.getIsReflection());
-    glUniform1i(uniformIsRefraction, mainGUI.getIsRefraction());
-    glUniform1f(uniformIOR, mainGUI.getIOR());
-    glUniform1f(uniformFresnelReflectance, mainGUI.getFresnelReflectance());
-    glUniform1f(uniformDispersion, mainGUI.getDispersion());
-    glUniform1f(uniformNormalStrength, mainGUI.getNormalStrength());
-    glUniform1f(uniformSpecularStrength, mainGUI.getSpecularStrength());
 }
 
 // Scene Properties====================================================================================================

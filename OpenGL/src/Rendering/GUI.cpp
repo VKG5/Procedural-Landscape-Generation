@@ -87,26 +87,6 @@ void GUI::elements(const std::string& shadingMode) {
                 ImGui::ColorEdit4("Object Color", (float*)&objectColor);
             }
 
-            // Options based on textures
-            else if(shaded) {
-                // Normal Map Strength
-                ImGui::DragFloat("Normal Map", (float*)&normalStrength, sliderSpeed, 0.0f, 1.0f);
-
-                // Specular Map Strength
-                ImGui::DragFloat("Specular Map", (float*)&specularSrength, sliderSpeed, 0.0f, 1.0f);
-            }
-
-            // Environment Settings
-            ImGui::Checkbox("Environment Mapping", &isEnvMapping);
-
-            if(isEnvMapping) {
-                ImGui::Checkbox("Reflection", &isReflection);
-                ImGui::Checkbox("Refraction", &isRefraction);
-                ImGui::DragFloat("IOR", (float*)&ior, sliderSpeed);
-                ImGui::DragFloat("Fresnel Reflectance", (float*)&f0, sliderSpeed);
-                ImGui::DragFloat("Dispersion", (float*)&dispersion, sliderSpeed / 10, 0.0f, 1.0f);
-            }
-
             if(ImGui::BeginTabBar("Object Properties")) {
                 if(ImGui::BeginTabItem("Material")) {
                     ImGui::DragFloat("Specular", (float*)&specular, sliderSpeed, 0.0f, 1.0f);

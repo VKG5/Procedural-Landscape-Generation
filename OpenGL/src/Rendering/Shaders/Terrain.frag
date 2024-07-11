@@ -68,8 +68,6 @@ uniform vec3 eyePosition;
 
 // Instantiating Lights================================================================================================
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLight[MAX_POINT_LIGHTS];
-uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
 
 
 // Instantiating Textures==============================================================================================
@@ -130,5 +128,11 @@ vec4 calcDirectionalLight() {
 void main() {
     vec4 finalColour = calcDirectionalLight();
 
-    outputColor = finalColour;
+    if(isShaded) {
+        outputColor = texture(diffuseMap, geomTexCoord) * finalColour;
+    }
+
+    else {
+        outputColor = objectColor * finalColour;
+    }
 }
