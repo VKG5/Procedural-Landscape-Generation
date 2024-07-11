@@ -84,7 +84,7 @@ vec4 calcLightByDirection(Light light, vec3 direction) {
     // Diffuse Light
     // Getting the cosine of angle between two vectors
     float diffuseFactor = max(dot(normalize(geomNormal), normalize(direction)), 0.0);
-    vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity, 1.0);
+    vec4 diffuseColour = vec4(light.colour, 1.0)  * light.diffuseIntensity * diffuseFactor;
 
     // Specular Light
     vec4 specularColour = vec4(0, 0, 0, 0);
@@ -100,5 +100,5 @@ vec4 calcDirectionalLight() {
 void main() {
     vec4 finalColour = calcDirectionalLight();
 
-    outputColor = texture(diffuseMap, geomTexCoord) * finalColour;
+    outputColor = finalColour;
 }

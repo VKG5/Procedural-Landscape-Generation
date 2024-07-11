@@ -111,7 +111,7 @@ void Model::loadMesh(aiMesh * mesh, const aiScene * scene) {
 
         // Adding Normals
         // Adding the reversed values because of the shader code
-        vertices.insert(vertices.end(), { -mesh->mNormals[i].x, -mesh->mNormals[i].y, -mesh->mNormals[i].z });
+        vertices.insert(vertices.end(), { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z });
 
         // Adding Tangents
         // Checking if the tagnets are availabe

@@ -102,14 +102,21 @@ void main() {
 
     // EndPrimitive();
 
+    // Calculate the normal of the triangle using cross product
+    vec3 edge1 = fragPos[1] - fragPos[0];
+    vec3 edge2 = fragPos[2] - fragPos[0];
+    vec3 normal = normalize(cross(edge1, edge2));
+
     // Since input primitive is a triangle, loop through 3 vertices
-    for (int i = 0; i < 3; i++)
-    {
+    for (int i = 0; i < 3; i++) {
         // Pass through the vertex position
         gl_Position = gl_in[i].gl_Position;
 
         // Pass through the vertex color
         geomCol = col[i];
+        geomTexCoord = texCoord[i];
+        geomNormal = normal;
+        geomFragPos = fragPos[i];
 
         // Emit the current vertex
         EmitVertex();
