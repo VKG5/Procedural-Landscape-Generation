@@ -101,6 +101,9 @@ void Shader::compileProgram() {
     // Specular Highlights
     uniformEyePosition = glGetUniformLocation(shaderID, "eyePosition");
 
+    // Landscape Properties
+    uniformLandscapeHeight = glGetUniformLocation(shaderID, "landscapeHeight");
+
     // Point Light
     uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
 
@@ -352,6 +355,10 @@ GLuint Shader::getSpecularPreviewLocation() {
 
 GLuint Shader::getNormalPreviewLocation() {
     return uniformNormalPreview;
+}
+
+GLuint Shader::getLandscapeHeightLocation() {
+    return uniformLandscapeHeight;
 }
 
 // Textures

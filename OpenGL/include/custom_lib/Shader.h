@@ -70,7 +70,8 @@ private:
            uniformDiffuseTexture, uniformAmbientOcclusionTexture, uniformSpecularTexture, uniformNormalTexture, uniformNoiseTexture,
            uniformEnvMapping, uniformSkybox, uniformBackgroundColor,
            uniformIsReflection, uniformIsRefraction, uniformIOR, uniformFresnelReflectance, uniformDispersion,
-           uniformNormalStrength, uniformSpecularStrength;
+           uniformNormalStrength, uniformSpecularStrength,
+           uniformLandscapeHeight;
 
     void compileShader(const char* vertexCode, const char* fragmentCode);
     void compileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
@@ -125,6 +126,9 @@ public:
     GLuint getMaterialPreviewLocation();
     GLuint getSpecularPreviewLocation();
     GLuint getNormalPreviewLocation();
+
+    // Terrain Properties
+    GLuint getLandscapeHeightLocation();
 
     // Shader ID
     GLuint getShaderIDLocation();

@@ -20,9 +20,18 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+// Change the landscape height dynamically
+uniform float landscapeHeight;
+
 void main() {
-    gl_Position = projection * view * model * vec4(pos, 1.0);
-    col = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);
+    vec3 position = pos;
+
+    // Adding the height offset of the landscape
+    position.y *= landscapeHeight;
+
+    gl_Position = projection * view * model * vec4(position, 1.0);
+
+    col = vec4(clamp(position, 0.0f, 1.0f), 1.0f);
 
     texCoord = tex;
 

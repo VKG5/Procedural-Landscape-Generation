@@ -62,6 +62,7 @@ private:
     GLuint uniformEnvMapping, uniformSkybox, uniformBackgroundColor;
     GLuint uniformIsReflection, uniformIsRefraction, uniformIOR, uniformFresnelReflectance, uniformDispersion;
     GLuint uniformNormalStrength, uniformSpecularStrength;
+    GLuint uniformLandscapeHeight;
 
     // Our main window
     Window& mainWindow;

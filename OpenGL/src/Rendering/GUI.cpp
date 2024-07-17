@@ -79,6 +79,8 @@ void GUI::elements(const std::string& shadingMode) {
                         refreshTerrain = true;
                     };
 
+                    ImGui::DragFloat("Height", (float*)&landscapeHeight, sliderSpeed);
+
                     // End Current Tab Item
                     ImGui::EndTabItem();
                 }

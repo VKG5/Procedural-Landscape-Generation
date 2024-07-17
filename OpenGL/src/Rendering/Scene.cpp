@@ -12,6 +12,7 @@ Scene::Scene(Window& window)  :
                 uniformEnvMapping(0), uniformSkybox(0), uniformBackgroundColor(0),
                 uniformIsReflection(0), uniformIsRefraction(0), uniformIOR(0), uniformFresnelReflectance(0), uniformDispersion(0),
                 uniformNormalStrength(0), uniformSpecularStrength(0),
+                uniformLandscapeHeight(0),
                 mainWindow(window) {
     // Initialize any resources here
     camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.125f, 3.0f);
@@ -59,7 +60,6 @@ void Scene::createTerrain(const char* heightmapLoc) {
     std::vector<GLfloat> vertices;
 
     float yScale = 64.0f / 256.0f, yShift = 16.0f;
-
 
     // Using a lambda to get the height at a specific grid point
     auto getHeight = [&](int x, int z) -> float {
@@ -250,6 +250,9 @@ void Scene::getUniformsFromShader(Shader * shader) {
     // uniformSpecularPreview = shader->getSpecularPreviewLocation();
     // uniformNormalPreview = shader->getNormalPreviewLocation();
 
+    // Landscape Height Values
+    uniformLandscapeHeight = shader->getLandscapeHeightLocation();
+
     // Texture
     uniformDiffuseTexture = shader->getMainTextureLocation();
 }
@@ -316,6 +319,9 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
     glUniform3f(uniformBackgroundColor, mainGUI.getBackgroundColor().x,
                                         mainGUI.getBackgroundColor().y,
                                         mainGUI.getBackgroundColor().z);
+
+    // Landscape Properties - Uniform Setting
+    glUniform1f(uniformLandscapeHeight, mainGUI.getLandscapeHeight());
 }
 
 // Scene Properties====================================================================================================

@@ -86,6 +86,7 @@ private:
     // Terrain Settings
     char heightmapPath[256] = "D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png";
     bool refreshTerrain = false;
+    float landscapeHeight = 1.0f;
 
 public:
     // Constructor
@@ -122,6 +123,7 @@ public:
     // Terrain Properties
     const char* getHeightmapPath() const { return heightmapPath; }
     bool getIsTerrainRefreshRequired() const { return refreshTerrain; }
+    float getLandscapeHeight() const { return landscapeHeight; }
 
     // Camera
     int getSkyboxIndex() const { return skyboxIndex; }
