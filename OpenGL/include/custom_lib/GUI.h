@@ -78,10 +78,14 @@ private:
     float normalStrength = 0.0f;
     float specularSrength = 0.0f;
 
-    // Material settings
+    // Material Settings
     float specular = 0.5f;
     float shininess = 256.0f;
     float metalness = 0.5f;
+
+    // Terrain Settings
+    char heightmapPath[256] = "D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png";
+    bool refreshTerrain = false;
 
 public:
     // Constructor
@@ -114,6 +118,10 @@ public:
 
     // Material Preview Mode
     bool getMaterialPreview() const { return materialPreview; }
+
+    // Terrain Properties
+    const char* getHeightmapPath() const { return heightmapPath; }
+    bool getIsTerrainRefreshRequired() const { return refreshTerrain; }
 
     // Camera
     int getSkyboxIndex() const { return skyboxIndex; }
@@ -153,9 +161,10 @@ public:
     void setCameraFOV(float fieldOfView);
     void setCameraScale(float scale);
     void setCameraClipping(float near, float far);
-
-    // IK
     void setCameraPosition(float x, float y, float z);
+
+    // Terrain
+    void setIsTerrainRefreshRequired(bool isRequired);
 
     // Destructor
     ~GUI();

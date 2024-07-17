@@ -69,6 +69,25 @@ void GUI::elements(const std::string& shadingMode) {
             //     ImGui::Checkbox("Normal", &normalPreview);
             // }
 
+            // File Path and Reload Terrain Button
+            if(ImGui::BeginTabBar("Terrain Properties")) {
+                if(ImGui::BeginTabItem("Terrain")) {
+                    ImGui::InputText("Heightmap Path", heightmapPath, sizeof(heightmapPath));
+
+                    // Upon pressing reload, set refreshTerrain to true
+                    if(ImGui::Button("Reload")) {
+                        refreshTerrain = true;
+                    };
+
+                    // End Current Tab Item
+                    ImGui::EndTabItem();
+                }
+
+                // End Current Tab Bar
+                ImGui::EndTabBar();
+            }
+
+
             // Spacing
             ImGui::Spacing();
             ImGui::Checkbox("Wireframe", &wireframe);
@@ -87,6 +106,8 @@ void GUI::elements(const std::string& shadingMode) {
                 ImGui::ColorEdit4("Object Color", (float*)&objectColor);
             }
 
+            // Spacing
+            ImGui::Spacing();
             if(ImGui::BeginTabBar("Object Properties")) {
                 if(ImGui::BeginTabItem("Material")) {
                     ImGui::DragFloat("Specular", (float*)&specular, sliderSpeed, 0.0f, 1.0f);
@@ -209,6 +230,10 @@ void GUI::setCameraPosition(float x, float y, float z) {
     cameraPos[0] = x;
     cameraPos[1] = y;
     cameraPos[2] = z;
+}
+
+void GUI::setIsTerrainRefreshRequired(bool isRequired) {
+    refreshTerrain = false;
 }
 
 void GUI::render(const std::string& shadingMode) {

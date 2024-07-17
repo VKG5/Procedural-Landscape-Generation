@@ -137,7 +137,7 @@ public:
 
     // General Elements================================================================================================
     // Add a simple plane/floor
-    void createTerrain();
+    void createTerrain(const char* heightmapLoc);
 
     // Creating and adding shaders to the scene
     void createShaders(const std::filesystem::path& currentSourceDir);

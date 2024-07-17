@@ -23,7 +23,7 @@ Scene::Scene(Window& window)  :
     mainGUI.initialize(mainWindow.getWindow());
 }
 
-void Scene::createTerrain() {
+void Scene::createTerrain(const char* heightmapLoc) {
     // If we already have a terrain
     if(trialTerrain) {
         delete trialTerrain;
@@ -41,7 +41,7 @@ void Scene::createTerrain() {
 
     trialTerrain = new Terrain(mainWindow, mainGUI);
 
-    trialTerrain->createTerrainFromHeightmap("D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png");
+    trialTerrain->createTerrainFromHeightmap(heightmapLoc);
 
     // Debugging
     // printHeightmapData( trialTerrain->getHeightmapTexture().getTexData(),
@@ -211,7 +211,7 @@ void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
     loadObjects();
 
     // Loading our terrain from a heightmap
-    createTerrain();
+    createTerrain("D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png");
 }
 
 void Scene::getUniformsFromShader(Shader * shader) {
@@ -424,26 +424,32 @@ void Scene::generalElements(glm::mat4& projectionMatrix, glm::mat4& viewMatrix) 
                                          radius * glm::sin(cameraAngle) + mainGUI.getCameraPosition()[2]));
         }
 
-        // Toggling Spot Light on pressing L
-        if(mainWindow.getKeys()[GLFW_KEY_L]) {
-            // Debugging
-            // printf("Pressed L!");
+        // // Toggling Spot Light on pressing L
+        // if(mainWindow.getKeys()[GLFW_KEY_L]) {
+        //     // Debugging
+        //     // printf("Pressed L!");
 
-            spotLights[0].toggle();
-            mainWindow.getKeys()[GLFW_KEY_L] = false;
-        }
+        //     spotLights[0].toggle();
+        //     mainWindow.getKeys()[GLFW_KEY_L] = false;
+        // }
 
-        if(mainWindow.getKeys()[GLFW_KEY_B]) {
-            // Debugging
-            // printf("Pressed B!\n");
+        // if(mainWindow.getKeys()[GLFW_KEY_B]) {
+        //     // Debugging
+        //     // printf("Pressed B!\n");
 
-            shadingModel = (shadingModel + 1) % MAX_SHADING_MODELS;
+        //     shadingModel = (shadingModel + 1) % MAX_SHADING_MODELS;
 
-            // Debugging
-            // std::cout<<shadingModel<<"\n";
+        //     // Debugging
+        //     // std::cout<<shadingModel<<"\n";
 
-            // To prevent multiple clicks in this loop
-            mainWindow.getKeys()[GLFW_KEY_B] = false;
+        //     // To prevent multiple clicks in this loop
+        //     mainWindow.getKeys()[GLFW_KEY_B] = false;
+        // }
+
+        if(mainGUI.getIsTerrainRefreshRequired()) {
+            createTerrain(mainGUI.getHeightmapPath());
+
+            mainGUI.setIsTerrainRefreshRequired(false);
         }
     }
 
