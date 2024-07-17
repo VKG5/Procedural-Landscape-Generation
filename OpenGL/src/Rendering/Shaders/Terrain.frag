@@ -128,7 +128,11 @@ vec4 calcDirectionalLight() {
 void main() {
     vec4 finalColour = calcDirectionalLight();
 
-    if(isShaded) {
+    if(isWireframe) {
+        outputColor = wireframeColor;
+    }
+
+    else if(isShaded) {
         outputColor = texture(diffuseMap, geomTexCoord) * finalColour;
     }
 

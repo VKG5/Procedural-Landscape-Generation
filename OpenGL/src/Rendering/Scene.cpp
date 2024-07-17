@@ -41,7 +41,9 @@ void Scene::createTerrain(const char* heightmapLoc) {
 
     trialTerrain = new Terrain(mainWindow, mainGUI);
 
-    trialTerrain->createTerrainFromHeightmap(heightmapLoc);
+    // Removing \\ from path
+    std::string path(removeBackslash(heightmapLoc));
+    trialTerrain->createTerrainFromHeightmap(path.c_str());
 
     // Debugging
     // printHeightmapData( trialTerrain->getHeightmapTexture().getTexData(),
