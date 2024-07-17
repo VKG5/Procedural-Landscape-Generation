@@ -64,12 +64,6 @@ private:
     float interOcularDistance = 0.065f;
     float convergeDistance = 2.0f;
 
-    // Point Lights
-    bool isPointLights = false;
-
-    // Spot Lights
-    bool isSpotLights = false;
-
     // Skybox
     bool isSkyBox = false;
 

@@ -25,8 +25,10 @@ bool Terrain::createTerrainFromHeightmap(const char* fileLoc) {
     return true;
 }
 
-
-
 Terrain::~Terrain() {
+    height = 0;
+    width = 0;
+    bitDepth = 0;
 
+    heightmapTex.cleanTexture();
 }

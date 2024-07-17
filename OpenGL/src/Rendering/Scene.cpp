@@ -24,6 +24,21 @@ Scene::Scene(Window& window)  :
 }
 
 void Scene::createTerrain() {
+    // If we already have a terrain
+    if(trialTerrain) {
+        delete trialTerrain;
+
+        // Making the object null after deleting the existing one
+        trialTerrain = nullptr;
+
+        // Clearing out the mesh list
+        for (auto* mesh : meshList) {
+            delete mesh;
+        }
+
+        meshList.clear();
+    }
+
     trialTerrain = new Terrain(mainWindow, mainGUI);
 
     trialTerrain->createTerrainFromHeightmap("D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png");
@@ -229,9 +244,9 @@ void Scene::getUniformsFromShader(Shader * shader) {
     uniformBackgroundColor = shader->getBackgroundColourLocation();
 
     // Material Preview - Maps
-    uniformMaterialPreview = shader->getMaterialPreviewLocation();
-    uniformSpecularPreview = shader->getSpecularPreviewLocation();
-    uniformNormalPreview = shader->getNormalPreviewLocation();
+    // uniformMaterialPreview = shader->getMaterialPreviewLocation();
+    // uniformSpecularPreview = shader->getSpecularPreviewLocation();
+    // uniformNormalPreview = shader->getNormalPreviewLocation();
 
     // Texture
     uniformDiffuseTexture = shader->getMainTextureLocation();
@@ -240,19 +255,19 @@ void Scene::getUniformsFromShader(Shader * shader) {
 void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, Shader * shader) {
     // Binding the texture to correct texture units
     shader->setTexture(uniformDiffuseTexture, 0);
-    shader->setTexture(uniformSpecularTexture, 1);
-    shader->setTexture(uniformNormalTexture, 2);
+    // shader->setTexture(uniformSpecularTexture, 1);
+    // shader->setTexture(uniformNormalTexture, 2);
 
     // TODO : Intergrate this to work like a proper roughness map
     // uniformNoiseTexture = shader.getNoiseTextureLocation();
     // shader.setTexture(uniformNoiseTexture, 1);
 
-    // Set the position of our moveable spot light w.r.t. the camera
-    glm::vec3 lowerLight = camera.getCameraPosition();
-    lowerLight.y -= 0.369f;
+    // // Set the position of our moveable spot light w.r.t. the camera
+    // glm::vec3 lowerLight = camera.getCameraPosition();
+    // lowerLight.y -= 0.369f;
 
-    // Getting torch control
-    spotLights[0].setFlash(lowerLight, camera.getCameraDirection());
+    // // Getting torch control
+    // spotLights[0].setFlash(lowerLight, camera.getCameraDirection());
 
     // Lights
     // Directional Light
@@ -279,7 +294,7 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
 
     // Setting the triggers from UI Elements
     // Material Preview
-    glUniform1i(uniformMaterialPreview, mainGUI.getMaterialPreview());
+    // glUniform1i(uniformMaterialPreview, mainGUI.getMaterialPreview());
 
     // Object Properties
     glUniform1i(uniformIsWireframe, mainGUI.getIsWireframe());

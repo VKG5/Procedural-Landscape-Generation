@@ -56,18 +56,18 @@ void GUI::elements(const std::string& shadingMode) {
             // Spacing
             ImGui::Spacing();
 
-            ImGui::Checkbox("Material Preview", &materialPreview);
-            // Checking different maps
-            // 1. Specular
-            // 2. Normal
-            if(materialPreview) {
-                ImGui::Checkbox("Specular", &specularPreview);
+            // ImGui::Checkbox("Material Preview", &materialPreview);
+            // // Checking different maps
+            // // 1. Specular
+            // // 2. Normal
+            // if(materialPreview) {
+            //     ImGui::Checkbox("Specular", &specularPreview);
 
-                // Put the next element on the same line
-                ImGui::SameLine();
+            //     // Put the next element on the same line
+            //     ImGui::SameLine();
 
-                ImGui::Checkbox("Normal", &normalPreview);
-            }
+            //     ImGui::Checkbox("Normal", &normalPreview);
+            // }
 
             // Spacing
             ImGui::Spacing();
@@ -172,16 +172,6 @@ void GUI::elements(const std::string& shadingMode) {
             ImGui::DragFloat3("Direction", directionalLightDirection, sliderSpeed, -360.0f, 360.0f, "%.3f");
             ImGui::DragFloat("Ambient", &directionalLightAmbient, sliderSpeed);
             ImGui::DragFloat("Diffuse", &directionalLightDiffuse, sliderSpeed);
-
-            // TODO : Implement Point Light Controls
-            ImGui::Spacing();
-            ImGui::Text("Point Lights");
-            ImGui::Checkbox("Point Active", &isPointLights);
-
-            // TODO : Implement Spot Light Controls
-            ImGui::Spacing();
-            ImGui::Text("Spot Lights");
-            ImGui::Checkbox("Spot Active", &isSpotLights);
 
             // End Current Tab Item
             ImGui::EndTabItem();

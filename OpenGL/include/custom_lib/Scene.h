@@ -119,7 +119,7 @@ private:
     Model* cube;
 
     // Terrains
-    Terrain* trialTerrain;
+    Terrain* trialTerrain = nullptr;
 
     // Camera Rotation
     float radius = 10.0f;
