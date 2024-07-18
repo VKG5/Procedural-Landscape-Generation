@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include <iostream>
 
 // Using initializer list since the type is primitive GLuint and we need the values initialized upon creation of the object
 Scene::Scene(Window& window)  :
@@ -187,18 +188,34 @@ void Scene::createTextures() {
     // 2. No Interpolation and MIP Maps
     // 3. Interpolation and MIP Maps Near
     // 4. Intepolation and MIP Maps Interpolation
-    whiteTexture = Texture("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Textures/Default/white.jpg");
+    std::string whiteTexturePath = returnPath(currSceneDir, "Textures/Default/white.jpg");
+    whiteTexture = Texture(whiteTexturePath.c_str());
     whiteTexture.loadTexture();
 
     //* Removed the automatic deallocation of texture data memory, need to do it manually every time!
     whiteTexture.freeTextureData();
 
-    brickTexture = Texture("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Textures/Default/brickHi.png");
+    std::string brickTexturePath = returnPath(currSceneDir, "Textures/Default/brickHi.png");
+    brickTexture = Texture(brickTexturePath.c_str());
     brickTexture.loadTexture();
     brickTexture.freeTextureData();
 }
 
+void Scene::loadObjects() {
+    // Loading Models==================================================================================================
+    cube = new Model();
+    std::string cubePath = returnPath(currSceneDir, "Models/cube.obj");
+    cube->loadModel(cubePath.c_str());
+
+    monkey = new Model();
+    std::string monkeyPath = returnPath(currSceneDir, "Models/monkey.obj");
+    monkey->loadModel(monkeyPath.c_str());
+}
+
 void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
+    // Storing the current source directory locally
+    currSceneDir = currentSourceDir;
+
     // Create Shaders
     createShaders(currentSourceDir);
 
@@ -213,7 +230,8 @@ void Scene::setupScene(const std::filesystem::path& currentSourceDir) {
     loadObjects();
 
     // Loading our terrain from a heightmap
-    createTerrain("D:/Programs/Python/Thesis/OpenGL/src/Rendering/Textures/Heightmaps/Mountains.png");
+    std::filesystem::path heightmapPath = currSceneDir / "Textures/Heightmaps/Mountains.png";
+    createTerrain(heightmapPath.string().c_str());
 }
 
 void Scene::getUniformsFromShader(Shader * shader) {
@@ -473,15 +491,6 @@ void Scene::generalElements(glm::mat4& projectionMatrix, glm::mat4& viewMatrix) 
 
 
 // Custom Scene definition is here!====================================================================================
-void Scene::loadObjects() {
-    // Loading Models==================================================================================================
-    cube = new Model();
-    cube->loadModel("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Models/cube.obj");
-
-    monkey = new Model();
-    monkey->loadModel("D:/Programs/C++/Rendering/OpenGL/src/Rendering/Models/monkey.obj");
-}
-
 void Scene::renderScene() {
     // if(rotationAngle < 360.0f) {
     //     rotationAngle += step;
@@ -493,8 +502,8 @@ void Scene::renderScene() {
 
     glm::mat4 base = glm::mat4(1.0f);
 
-    // // TRS
-    // base = glm::translate(base, glm::vec3(0.0f, 2.0f, 0.0f));
+    // TRS
+    base = glm::translate(base, glm::vec3(0.0f, mainGUI.getLandscapeHeight() / 2.0f, 0.0f));
     // base = glm::rotate(base, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
     // base = glm::scale(base, glm::vec3(1.5f));
 

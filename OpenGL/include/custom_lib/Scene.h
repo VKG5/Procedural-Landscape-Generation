@@ -132,6 +132,9 @@ private:
     // Initial Projection Matrix
     glm::mat4 projection;
 
+    // Storing the current source directory
+    std::filesystem::path currSceneDir;
+
 public:
     // Constructor
     Scene(Window& window);
