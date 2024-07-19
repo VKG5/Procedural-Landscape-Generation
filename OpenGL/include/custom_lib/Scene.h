@@ -121,6 +121,7 @@ private:
 
     // Terrains
     Terrain* trialTerrain = nullptr;
+    Texture heightmapTex;
 
     // Camera Rotation
     float radius = 10.0f;

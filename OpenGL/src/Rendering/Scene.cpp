@@ -52,6 +52,9 @@ void Scene::createTerrain(const char* heightmapLoc) {
     //                     trialTerrain->getHeightmapTexture().getWidth(),
     //                     trialTerrain->getHeightmapTexture().getHeight() );
 
+    // Storing the texture data
+    heightmapTex = trialTerrain->getHeightmapTexture();
+
     // Generating the vertex array
     int width = trialTerrain->getHeightmapTexture().getWidth();
     int height = trialTerrain->getHeightmapTexture().getHeight();
@@ -508,7 +511,14 @@ void Scene::renderScene() {
     // base = glm::scale(base, glm::vec3(1.5f));
 
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
-    whiteTexture.useTexture();
+
+    // Using white texture for shading
+    // if(mainGUI.getIsShaded()) {
+    //     whiteTexture.useTexture();
+    // }
+
+    // Using heightmap as the texture for shading
+    heightmapTex.useTexture();
 
     // Failsafe
     if(meshList.size()) {
@@ -520,6 +530,8 @@ void Scene::renderScene() {
         mainGUI.errorMessage("No valid terrain to render!");
     }
 
+    // Switching to the default white texture
+    whiteTexture.useTexture();
     monkey->updateMaterialProperties(mainGUI.getSpecular(), mainGUI.getShininess(), mainGUI.getMetalness());
     monkey->setMaterialUniforms(uniformSpecularIntensity, uniformShininess, uniformMetalness);
     monkey->renderModel();
