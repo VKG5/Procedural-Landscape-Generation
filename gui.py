@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLa
 from PyQt5.QtGui import QPixmap, QPalette, QColor
 from PyQt5.QtCore import QProcess, Qt
 
+import apiLink as api
 
 # <---------------------- Global Variables ----------------------->
 # Get location of the current file
