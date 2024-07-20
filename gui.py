@@ -1,7 +1,17 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
 from PyQt5.QtGui import QPixmap, QPalette, QColor
 from PyQt5.QtCore import QProcess, Qt
+
+# Get location of the current file
+directory = os.path.dirname(os.path.realpath(__file__))
+
+# Replace backslashes with forward slashes
+dir = directory.replace('\\', '/')
+
+# Concatenate the path to the executable
+executablePath = dir + '/OpenGL/build/src/Rendering/Debug/Executable.exe'
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -33,19 +43,48 @@ class MainWindow(QWidget):
         layout.addWidget(self.imageLabel)
         
         self.setLayout(layout)
-    
+
+        # Pointer to the C++ process
+        self.process = None
+
     def generateImage(self):
         # Placeholder for image generation logic
         # Here, just display a placeholder image
         self.imageLabel.setPixmap(QPixmap('path/to/generated/image.png'))
     
     def quitApp(self):
+        # Quit the launched application if it is running
+        if self.process and self.process.state() == QProcess.Running:
+            ## Debugging
+            print(f"Quitting application with PID : {self.process.processId()}")
+            
+            self.process.kill()
+            self.process.waitForFinished()
+            self.process = None
+        
+        else:
+            print("No application is running.")
+            
+        # Quit the GUI application
         QApplication.quit()
     
     def launchApplication(self):
-        # Placeholder for launching an application
-        # Example: Launching Notepad on Windows
-        QProcess.startDetached("D:/Programs/Python/Thesis/OpenGL/build/src/Rendering/Debug/Executable.exe")
+        # If process is already running, do not start another instance
+        if self.process and self.process.state() == QProcess.Running:
+            print("Application is already running.")
+            return
+
+        ## Debugging
+        print(f"Starting application from : \"{executablePath}\"")
+        
+        self.process = QProcess()
+        self.process.start(executablePath)
+
+        if self.process.waitForStarted():
+            print(f"Application started with PID : {self.process.processId()}")
+        
+        else:
+            print("Failed to start application.")
 
 def main():
     app = QApplication(sys.argv)
