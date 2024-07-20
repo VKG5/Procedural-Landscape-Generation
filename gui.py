@@ -15,6 +15,7 @@ directory = os.path.dirname(os.path.realpath(__file__))
 dir = directory.replace('\\', '/')
 
 # Concatenate the path to the executable
+apiBatchPath = dir + '/stable-diffusion-webui/webui-user.bat'
 executablePath = dir + '/OpenGL/build/src/Rendering/Debug/Executable.exe'
 imagePath = dir + '/stable-diffusion-webui/outputs/'
 
@@ -62,14 +63,46 @@ class MainWindow(QWidget):
         # Pointer to the C++ process
         self.process = None
 
+        # Pointer to SD API
+        self.apiProcess = None
+
+    # Function to start the Stable Diffusion API in the background
+    def startSDAPI(self):
+        # If process is already running, do not start another instance
+        if self.apiProcess and self.apiProcess.state() == QProcess.Running:
+            ## Debugging
+            print("SD API is already running.")
+            return
+        
+        ## Debugging
+        print(f"Starting SD API from : \"{apiBatchPath}\"")
+
+        self.apiProcess = QProcess()
+        self.apiProcess.start('cmd', ['/c', apiBatchPath])
+
+        if self.apiProcess.waitForStarted():
+            print(f"SD API started with PID : {self.apiProcess.processId()}")
+
+        else:
+            print("Failed to start SD API.")
+
+    # Function to call the SD API and generate images
     def generateImage(self):
-        # Placeholder for image generation logic
-        # Here, just display a placeholder image
+        # Starting the API of not already started
+        self.startSDAPI()
+
+        # api.runStableDiffusionAPIText2Img(type = 'txt2txt', prompt = self.promptTextField.text(), 
+        #                                   dimesnions = 1024, steps = 99, 
+        #                                   isUpscale = False, upscaleFactor = 2, 
+        #                                   seed = -1)
+
+        # Displaying the generated image
         self.imageLabel.setPixmap(QPixmap(imagePath + '/img2img-images/2024-06-25/00000-1723017853.png'))
         self.imageLabel.setAlignment(Qt.AlignCenter)
 
         self.pathTextField.setText(imagePath + 'img2img-images/2024-06-25/00000-1723017853.png')
     
+    # Function to quit the APIs, applications and processes if running
     def quitApp(self):
         # Quit the launched application if it is running
         if self.process and self.process.state() == QProcess.Running:
@@ -82,10 +115,23 @@ class MainWindow(QWidget):
         
         else:
             print("No application is running.")
+
+        # Quit the launched API if it is running
+        if self.apiProcess and self.apiProcess.state() == QProcess.Running:
+            ## Debugging
+            print(f"Quitting API with PID : {self.apiProcess.processId()}")
+            
+            self.apiProcess.kill()
+            self.apiProcess.waitForFinished()
+            self.apiProcess = None
+        
+        else:
+            print("No API is running.")
             
         # Quit the GUI application
         QApplication.quit()
     
+    # Function to launch the C++ application for rendering terrains in real-time using heightmaps
     def launchApplication(self):
         # If process is already running, do not start another instance
         if self.process and self.process.state() == QProcess.Running:
