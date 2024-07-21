@@ -16,7 +16,7 @@ url = "http://localhost:7861/"
 # You can have multiple options, which can be parsed in a JSON format
 ## *Refer to the following link for more details about the API : http://127.0.0.1:7860/docs/
 
-def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range", dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1):
+def runStableDiffusionAPI(generationType = "txt2txt", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1):
     # Make sure the prompt starts with the trigger word to make sure consistent results are produced
     triggerWords = "gamelandscapeheightmap512"
     finalPrompt = triggerWords + "\," + prompt
@@ -36,6 +36,10 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
         "width": dimesnions,
         "height": dimesnions,
 
+        # Setting the sampler name and scheduler type - Recommended 
+        # "sampler_name": sampler,
+        # "scheduler": scheduler,
+
         # Hi-Resolution
         "enable_hr": isUpscale,
         "hr_scale": upscaleFactor,
@@ -50,7 +54,7 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
     # You can send to different kinds of APIs
     # 1. /sdapi/v1/txt2img - Text to Image
     # 2. /sdapi/v1/img2img - Image to Image
-    response = requests.post(url = f'{url}/sdapi/v1/txt2img', json = payload)
+    response = requests.post(url = f'{url}/sdapi/v1/{generationType}', json = payload)
     r = response.json()
 
     # Decode and save the image (We get the image in a Binary 64 format)
@@ -60,7 +64,7 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
     '''
     for i in r['images']:
         # Decoding the 64-bit binary image to a PNG format
-        # image = Image.open(io.BytesIO(base64.b64decode(i.split(",",1)[0])))
+        image = Image.open(io.BytesIO(base64.b64decode(i.split(",",1)[0])))
 
         # Getting the details about the images, such as the prompt, etc.
         png_payload = {
@@ -72,6 +76,31 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
         pnginfo = PngImagePlugin.PngInfo()
         pnginfo.add_text("parameters", response2.json().get("info"))
 
-        # Get the path where the image is generated
-        # path = pnginfo.get("parameters").get("path")
-        # print("Image generated at:", path)
+        ## Debugging
+        # Extracting Hash Code for saving image with unique name
+        # There are 2 elements in the generated list, b'tEXt', and the details of the generation both of type 'byte'
+        # Converting back to string before accessing the data
+        byteData = pnginfo.chunks[0][1]
+        stringData = byteData.decode('utf-8')
+
+        ## Debugging
+        # print(stringData)
+
+        lines = stringData.split(',')
+        imageHash = None
+        for line in lines:
+            if "Model hash:" in line:
+                imageHash = line.split("Model hash:")[1].strip()
+                break
+
+        ## Debugging
+        # print(imageHash)
+    
+        # Save the image at a custom path
+        savePath = f'outputs/{imageHash}.png'
+        image.save(savePath, pnginfo=pnginfo)
+        
+        ## Debugging
+        print(f"Image saved at: {savePath}")
+
+        return savePath

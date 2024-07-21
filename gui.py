@@ -20,7 +20,7 @@ dir = directory.replace('\\', '/')
 # Concatenate the path to the executable
 apiBatchPath = dir + '/stable-diffusion-webui/webui-user.bat'
 executablePath = dir + '/OpenGL/build/src/Rendering/Debug/Executable.exe'
-imagePath = dir + '/stable-diffusion-webui/outputs/'
+imagePath = dir + '/'
 
 # <---------------------- Main Window ----------------------->
 class MainWindow(QWidget):
@@ -34,14 +34,14 @@ class MainWindow(QWidget):
         
         # Elements for controlling the SD API
         # Choosing the type of generation we are akming for
-        self.apiTypeComboBox = QComboBox()
+        self.typeComboBox = QComboBox()
 
         # Elements for the combo box
         # Usually include txt2img, img2img, etc.
-        self.apiTypeComboBox.addItem("txt2img")
-        self.apiTypeComboBox.addItem("img2img")
+        self.typeComboBox.addItem("txt2img")
+        self.typeComboBox.addItem("img2img")
 
-        layout.addWidget(self.apiTypeComboBox)
+        layout.addWidget(self.typeComboBox)
 
         # Prompt Text Field
         # Adding a new row element for putting fields in the same row
@@ -178,17 +178,32 @@ class MainWindow(QWidget):
         # Starting the API of not already started
         # self.startSDAPI()
 
+        ## Debugging
+        # print("Type:", self.typeComboBox.currentText())
+        # print("Prompt:", self.promptTextField.text())
+        # print("Dimensions:", self.dimensionsTextField.text())
+        # print("Steps:", self.stepsTextField.text())
+        # print("Upscale CheckBox:", self.upscaleCheckBox.isChecked())
+        # print("Upscale Factor:", self.upscaleFactorTextField.text())
+        # print("Seed:", self.seedTextField.text())
+
         # <---------------------- Call the API ----------------------->
-        # api.runStableDiffusionAPIText2Img(type = 'txt2txt', prompt = self.promptTextField.text(), 
-        #                                   dimesnions = 1024, steps = 99, 
-        #                                   isUpscale = False, upscaleFactor = 2, 
-        #                                   seed = -1)
+        generatedPath = api.runStableDiffusionAPI(  generationType = self.typeComboBox.currentText() if self.typeComboBox.currentText() else "txt2img", 
+                                                    prompt = self.promptTextField.text() if self.promptTextField.text() else "", 
+                                                    dimesnions = int(self.dimensionsTextField.text()) if self.dimensionsTextField.text() else 512, 
+                                                    steps = int(self.stepsTextField.text()) if self.stepsTextField.text() else 20, 
+                                                    isUpscale = self.upscaleCheckBox.isChecked(), 
+                                                    upscaleFactor = int(self.upscaleFactorTextField.text()) if self.upscaleFactorTextField.text() else 2, 
+                                                    seed = int(self.seedTextField.text()) if self.seedTextField.text() else -1  )
+
+        ## Debugging
+        # print(imagePath + generatedPath)
 
         # Displaying the generated image
-        self.imagePreviewField.setPixmap(QPixmap(imagePath + '/img2img-images/2024-06-25/00000-1723017853.png'))
+        self.imagePreviewField.setPixmap(QPixmap(imagePath + generatedPath))
         self.imagePreviewField.setAlignment(Qt.AlignCenter)
 
-        self.pathTextField.setText(imagePath + 'img2img-images/2024-06-25/00000-1723017853.png')
+        self.pathTextField.setText(imagePath + generatedPath)
     
     # Function to quit the APIs, applications and processes if running
     def quitApp(self):
