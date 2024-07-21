@@ -1,7 +1,10 @@
 # Importing required libraries
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
+                            QLabel, QLineEdit, QComboBox, QCheckBox, QHBoxLayout, \
+                            QAbstractSlider
+
 from PyQt5.QtGui import QPixmap, QPalette, QColor
 from PyQt5.QtCore import QProcess, Qt
 
@@ -29,14 +32,84 @@ class MainWindow(QWidget):
         # Layout
         layout = QVBoxLayout()
         
+        # Elements for controlling the SD API
+        # Choosing the type of generation we are akming for
+        self.apiTypeComboBox = QComboBox()
+
+        # Elements for the combo box
+        # Usually include txt2img, img2img, etc.
+        self.apiTypeComboBox.addItem("txt2img")
+        self.apiTypeComboBox.addItem("img2img")
+
+        layout.addWidget(self.apiTypeComboBox)
+
+        # Prompt Text Field
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.promptLabel = QLabel('Prompt:')
+        self.promptTextField = QLineEdit()
+        self.promptTextField.setPlaceholderText('Enter a prompt here...')
+
+        layout_h.addWidget(self.promptLabel)
+        layout_h.addWidget(self.promptTextField)
+
+        # Adding the prompt row to the main layout
+        layout.addLayout(layout_h)
+
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.dimensionsLabel = QLabel('Dimensions:')
+        self.dimensionsTextField = QLineEdit()
+        self.dimensionsTextField.setPlaceholderText('1024')
+
+        layout_h.addWidget(self.dimensionsLabel)
+        layout_h.addWidget(self.dimensionsTextField)
+
+        # Adding the dimesnions row to the main layout
+        layout.addLayout(layout_h)
+
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.stepsLabel = QLabel('Steps:')
+        self.stepsTextField = QLineEdit()
+        self.stepsTextField.setPlaceholderText('99')
+
+        layout_h.addWidget(self.stepsLabel)
+        layout_h.addWidget(self.stepsTextField)
+
+        # Adding the dimesnions row to the main layout
+        layout.addLayout(layout_h)
+        
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.upscaleCheckBox = QCheckBox('Upscale')
+        self.upscaleFactorLabel = QLabel('Upscale Factor:')
+        self.upscaleFactorTextField = QLineEdit()
+        self.upscaleFactorTextField.setPlaceholderText('2')
+        
+        layout_h.addWidget(self.upscaleCheckBox)
+        layout_h.addWidget(self.upscaleFactorLabel)
+        layout_h.addWidget(self.upscaleFactorTextField)
+        
+        # Adding the dimesnions row to the main layout
+        layout.addLayout(layout_h)
+
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.seedLabel = QLabel('Seed:')
+        self.seedTextField = QLineEdit()
+        self.seedTextField.setPlaceholderText('-1')
+
+        layout_h.addWidget(self.seedLabel)
+        layout_h.addWidget(self.seedTextField)
+
+        # Adding the dimesnions row to the main layout
+        layout.addLayout(layout_h)
+
         # Generate Image Button
         self.btnGenerateImage = QPushButton('Generate Image')
         self.btnGenerateImage.clicked.connect(self.generateImage)
         layout.addWidget(self.btnGenerateImage)
-        
-        # Prompt Text Field
-        self.promptTextField = QLineEdit('Enter prompt:')
-        layout.addWidget(self.promptTextField)
 
         # Launch Application Button
         self.btnLaunchApp = QPushButton('Launch Application')
@@ -50,14 +123,27 @@ class MainWindow(QWidget):
 
         # Image Preview
         self.imageLabel = QLabel('Image Preview')
-        self.imageLabel.setMaximumSize(2048, 2048)
-        layout.addWidget(self.imageLabel)
-        
-        # Path Text Field
-        self.pathTextField = QLineEdit('Generated Image Path:')
-        self.pathTextField.setReadOnly(True)
-        layout.addWidget(self.pathTextField)
+        self.imagePreviewField = QLabel()
+        self.imagePreviewField.setMaximumSize(2048, 2048)
 
+        layout.addWidget(self.imageLabel)
+        layout.addWidget(self.imagePreviewField)
+
+        # Path Text Field
+        # Adding a new row element for putting fields in the same row
+        layout_h = QHBoxLayout()
+        self.pathLabel = QLabel('Generated Image Path:')
+        self.pathTextField = QLineEdit()
+        self.pathTextField.setPlaceholderText('Path to the generated image...')
+        self.pathTextField.setReadOnly(True)
+        
+        layout_h.addWidget(self.pathLabel)
+        layout_h.addWidget(self.pathTextField)
+
+        # Adding the dimesnions row to the main layout
+        layout.addLayout(layout_h)
+
+        # Adding the dimesnions row to the main layout
         self.setLayout(layout)
 
         # Pointer to the C++ process
@@ -67,6 +153,7 @@ class MainWindow(QWidget):
         self.apiProcess = None
 
     # Function to start the Stable Diffusion API in the background
+    #*For now, the API is started using a batch file manually, the code below is not working
     def startSDAPI(self):
         # If process is already running, do not start another instance
         if self.apiProcess and self.apiProcess.state() == QProcess.Running:
@@ -89,16 +176,17 @@ class MainWindow(QWidget):
     # Function to call the SD API and generate images
     def generateImage(self):
         # Starting the API of not already started
-        self.startSDAPI()
+        # self.startSDAPI()
 
+        # <---------------------- Call the API ----------------------->
         # api.runStableDiffusionAPIText2Img(type = 'txt2txt', prompt = self.promptTextField.text(), 
         #                                   dimesnions = 1024, steps = 99, 
         #                                   isUpscale = False, upscaleFactor = 2, 
         #                                   seed = -1)
 
         # Displaying the generated image
-        self.imageLabel.setPixmap(QPixmap(imagePath + '/img2img-images/2024-06-25/00000-1723017853.png'))
-        self.imageLabel.setAlignment(Qt.AlignCenter)
+        self.imagePreviewField.setPixmap(QPixmap(imagePath + '/img2img-images/2024-06-25/00000-1723017853.png'))
+        self.imagePreviewField.setAlignment(Qt.AlignCenter)
 
         self.pathTextField.setText(imagePath + 'img2img-images/2024-06-25/00000-1723017853.png')
     

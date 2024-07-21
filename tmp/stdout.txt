@@ -1,0 +1,8 @@
+ Volume in drive D is Work
+ Volume Serial Number is 3279-FE76
+
+ Directory of D:\Programs\Python\Thesis\stable-diffusion-webui\venv\Scripts
+
+05/23/2024  06:52 PM           270,608 python.exe
+               1 File(s)        270,608 bytes
+               0 Dir(s)  108,408,918,016 bytes free

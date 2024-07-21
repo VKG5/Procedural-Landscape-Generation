@@ -6,8 +6,11 @@ import base64
 
 from PIL import Image, PngImagePlugin
 
-# Change this URL according to your local host on the browser
-url = "http://127.0.0.1:7860/"
+# Change this URL according to your local host on the browser - With webui
+# url = "http://127.0.0.1:7860/"
+
+# Set the API endpoint URL for --nowebui argument
+url = "http://localhost:7861/"
 
 # Payload is the prompt that will be passed to the server
 # You can have multiple options, which can be parsed in a JSON format
@@ -17,11 +20,13 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
     # Make sure the prompt starts with the trigger word to make sure consistent results are produced
     triggerWords = "gamelandscapeheightmap512"
     finalPrompt = triggerWords + "\," + prompt
-
+    
+    # Add any negative prompt you want to add, for example, if you don't want colors, pass in color as the prompt
+    negativePrompt = "Colors"
     payload = {
         # Main Prompt
         "prompt": finalPrompt,
-        "negative_prompt": "",
+        "negative_prompt": negativePrompt,
 
         # Steps and Batch properties
         "batch_size": 1,
@@ -54,7 +59,8 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
     The response contains three entries; images, parameters, and info, and I have to find some way to get the information from these entries.
     '''
     for i in r['images']:
-        image = Image.open(io.BytesIO(base64.b64decode(i.split(",",1)[0])))
+        # Decoding the 64-bit binary image to a PNG format
+        # image = Image.open(io.BytesIO(base64.b64decode(i.split(",",1)[0])))
 
         # Getting the details about the images, such as the prompt, etc.
         png_payload = {
@@ -66,5 +72,6 @@ def runStableDiffusionAPIText2Img(type = "txt2txt", prompt = "A mountain range",
         pnginfo = PngImagePlugin.PngInfo()
         pnginfo.add_text("parameters", response2.json().get("info"))
 
-        # Save the image
-        image.save('Outputs/output.png', pnginfo=pnginfo)
+        # Get the path where the image is generated
+        # path = pnginfo.get("parameters").get("path")
+        # print("Image generated at:", path)
