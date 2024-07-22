@@ -200,7 +200,9 @@ class MainWindow(QWidget):
         # print(imagePath + generatedPath)
 
         # Displaying the generated image
-        self.imagePreviewField.setPixmap(QPixmap(imagePath + generatedPath))
+        pixmap = QPixmap(imagePath + generatedPath)
+        pixmap = pixmap.scaled(512, 512, Qt.AspectRatioMode.KeepAspectRatio)
+        self.imagePreviewField.setPixmap(pixmap)
         self.imagePreviewField.setAlignment(Qt.AlignCenter)
 
         self.pathTextField.setText(imagePath + generatedPath)

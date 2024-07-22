@@ -16,7 +16,7 @@ url = "http://localhost:7861/"
 # You can have multiple options, which can be parsed in a JSON format
 ## *Refer to the following link for more details about the API : http://127.0.0.1:7860/docs/
 
-def runStableDiffusionAPI(generationType = "txt2txt", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1):
+def runStableDiffusionAPI(generationType = "txt2img", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1):
     # Make sure the prompt starts with the trigger word to make sure consistent results are produced
     triggerWords = "gamelandscapeheightmap512"
     finalPrompt = triggerWords + "\," + prompt
@@ -39,6 +39,9 @@ def runStableDiffusionAPI(generationType = "txt2txt", prompt = "A mountain range
         # Setting the sampler name and scheduler type - Recommended 
         # "sampler_name": sampler,
         # "scheduler": scheduler,
+        
+        # Denoising strength for the image - [0, 1]
+        "denoising_strength": 0.75,
 
         # Hi-Resolution
         "enable_hr": isUpscale,
@@ -89,8 +92,8 @@ def runStableDiffusionAPI(generationType = "txt2txt", prompt = "A mountain range
         lines = stringData.split(',')
         imageHash = None
         for line in lines:
-            if "Model hash:" in line:
-                imageHash = line.split("Model hash:")[1].strip()
+            if "Seed:" in line:
+                imageHash = line.split("Seed:")[1].strip()
                 break
 
         ## Debugging
