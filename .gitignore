@@ -144,3 +144,6 @@ ipch/
 
 # Visual Studio Trace Files
 *.e2e
+
+# Ignoring generated images
+outputs/
