@@ -3,6 +3,7 @@ import json
 import requests
 import io
 import base64
+import os
 
 from PIL import Image, PngImagePlugin
 
@@ -16,7 +17,7 @@ url = "http://localhost:7861/"
 # You can have multiple options, which can be parsed in a JSON format
 ## *Refer to the following link for more details about the API : http://127.0.0.1:7860/docs/
 
-def runStableDiffusionAPI(generationType = "txt2img", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1):
+def runStableDiffusionAPI(generationType = "txt2img", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1, imagePath = ""):
     # Make sure the prompt starts with the trigger word to make sure consistent results are produced
     triggerWords = "gamelandscapeheightmap512"
     finalPrompt = triggerWords + "\," + prompt
@@ -52,6 +53,24 @@ def runStableDiffusionAPI(generationType = "txt2img", prompt = "A mountain range
         # Seed -1 means a random seed per generation
         "seed": seed
     }
+
+    if generationType == "img2img":
+        if not os.path.isfile(imagePath):
+            print(f"Invalid image path provided for img2img generation : {imagePath}")
+            return ""
+
+        # Used if you want to encode the image being passed to base64
+        with open(imagePath, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+        
+        payload.update({
+            "init_images": [encoded_image],
+            # "sampler_name": sampler,  # Ensure sampler_name is set for img2img
+            # "scheduler": scheduler,   # Ensure scheduler is set for img2img
+        })
+
+    ## Debugging
+    # print(payload)
 
     # Send defined payload to the URL through the API
     # You can send to different kinds of APIs

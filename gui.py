@@ -3,7 +3,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
                             QLabel, QLineEdit, QComboBox, QCheckBox, QHBoxLayout, \
-                            QAbstractSlider
+                            QAbstractSlider, QFileDialog
 
 from PyQt5.QtGui import QPixmap, QPalette, QColor
 from PyQt5.QtCore import QProcess, Qt
@@ -40,8 +40,18 @@ class MainWindow(QWidget):
         # Usually include txt2img, img2img, etc.
         self.typeComboBox.addItem("txt2img")
         self.typeComboBox.addItem("img2img")
+        self.typeComboBox.currentIndexChanged.connect(self.on_combobox_changed)
 
         layout.addWidget(self.typeComboBox)
+        
+        # File explorer button (initially hidden)
+        self.btnSelectPrompt = QPushButton('Select Image File')
+        self.btnSelectPrompt.clicked.connect(self.selectPromptFile)
+        self.btnSelectPrompt.setVisible(False)
+        
+        self.imagePath = ""
+
+        layout.addWidget(self.btnSelectPrompt)
 
         # Prompt Text Field
         # Adding a new row element for putting fields in the same row
@@ -152,6 +162,21 @@ class MainWindow(QWidget):
         # Pointer to SD API
         self.apiProcess = None
 
+    # This is to update the UI when the type in the combobox is changed
+    def on_combobox_changed(self):
+        if self.typeComboBox.currentText() == "img2img":
+            self.btnSelectPrompt.setVisible(True)
+        else:
+            self.btnSelectPrompt.setVisible(False)
+
+    # Function to select the prompt file using a file explorer
+    def selectPromptFile(self):
+        options = QFileDialog.Options()
+        filePath, _ = QFileDialog.getOpenFileName(self, "Select Guide Image", "", "Images (*.png *.jpg *.jpeg)", options=options)
+        if filePath:
+            print(f"Selected file: {filePath}")
+            self.imagePath = filePath
+            
     # Function to start the Stable Diffusion API in the background
     #*For now, the API is started using a batch file manually, the code below is not working
     def startSDAPI(self):
@@ -186,7 +211,7 @@ class MainWindow(QWidget):
         # print("Upscale CheckBox:", self.upscaleCheckBox.isChecked())
         # print("Upscale Factor:", self.upscaleFactorTextField.text())
         # print("Seed:", self.seedTextField.text())
-
+    
         # <---------------------- Call the API ----------------------->
         generatedPath = api.runStableDiffusionAPI(  generationType = self.typeComboBox.currentText() if self.typeComboBox.currentText() else "txt2img", 
                                                     prompt = self.promptTextField.text() if self.promptTextField.text() else "", 
@@ -194,7 +219,8 @@ class MainWindow(QWidget):
                                                     steps = int(self.stepsTextField.text()) if self.stepsTextField.text() else 20, 
                                                     isUpscale = self.upscaleCheckBox.isChecked(), 
                                                     upscaleFactor = int(self.upscaleFactorTextField.text()) if self.upscaleFactorTextField.text() else 2, 
-                                                    seed = int(self.seedTextField.text()) if self.seedTextField.text() else -1  )
+                                                    seed = int(self.seedTextField.text()) if self.seedTextField.text() else -1,
+                                                    imagePath = self.imagePath if self.imagePath else "" )
 
         ## Debugging
         # print(imagePath + generatedPath)
