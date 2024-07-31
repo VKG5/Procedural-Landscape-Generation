@@ -20,7 +20,7 @@ url = "http://localhost:7861/"
 def runStableDiffusionAPI(generationType = "txt2img", prompt = "A mountain range", sampler = 'Euler a', scheduler = 'Automatic', dimesnions = 512, steps = 50, isUpscale = False, upscaleFactor = 2, seed = -1, imagePath = ""):
     # Make sure the prompt starts with the trigger word to make sure consistent results are produced
     triggerWords = "gamelandscapeheightmap512"
-    finalPrompt = triggerWords + "\," + prompt
+    finalPrompt = triggerWords + ", " + prompt
     
     # Add any negative prompt you want to add, for example, if you don't want colors, pass in color as the prompt
     negativePrompt = "Colors"
