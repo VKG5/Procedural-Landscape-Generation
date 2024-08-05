@@ -35,6 +35,12 @@ private:
     bool materialPreview = false;
     bool specularPreview = false;
     bool normalPreview = false;
+    bool hypsometricPreview = false;
+
+    // Height
+    float hypsometricHeight = 1.0f;
+    int hypsometricHeightMultiplier = 2;
+
 
     // Light settings
     // Directional Light
@@ -120,6 +126,11 @@ public:
 
     // Normal Preview
     bool getIsNormal() const { return normalPreview; }
+
+    // Hypsometric Preview settings
+    bool getHysometricPreview() const { return hypsometricPreview; }
+    float getHypsometricHeight() const { return hypsometricHeight; }
+    int getHypsometricHeightMultiplier() const { return hypsometricHeightMultiplier; }
 
     // Background Color
     ImVec4 getBackgroundColor() const { return bgColor; }

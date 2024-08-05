@@ -69,8 +69,13 @@ void Shader::compileProgram() {
     uniformIsShaded = glGetUniformLocation(shaderID, "isShaded");
     uniformIsWireframe = glGetUniformLocation(shaderID, "isWireframe");
     uniformIsNormal = glGetUniformLocation(shaderID, "isNormal");
+    uniformIsHypsometricTint = glGetUniformLocation(shaderID, "isHypsometricTint");
+    uniformHypsometricHeight = glGetUniformLocation(shaderID, "hypsometricHeight");
+    uniformHypsometricMultiplier = glGetUniformLocation(shaderID, "hypsometricMultiplier");
+
     uniformObjectColor = glGetUniformLocation(shaderID, "objectColor");
     uniformWireframeColor = glGetUniformLocation(shaderID, "wireframeColor");
+
 
     // Tramission properties
     uniformIsReflection = glGetUniformLocation(shaderID, "reflection");
@@ -398,6 +403,18 @@ GLuint Shader::getSkyboxLocation() {
 
 GLuint Shader::getBackgroundColourLocation() {
     return uniformBackgroundColor;
+}
+
+GLuint Shader::getIsHypsometricTintLocation() {
+    return uniformIsHypsometricTint;
+}
+
+GLuint Shader::getHypsometricHeightLocation() {
+    return uniformHypsometricHeight;
+}
+
+GLuint Shader::getHypsometricMultiplierLocation() {
+    return uniformHypsometricMultiplier;
 }
 
 // Getting the shader ID===============================================================================================

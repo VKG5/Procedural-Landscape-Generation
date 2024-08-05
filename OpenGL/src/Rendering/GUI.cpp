@@ -112,6 +112,15 @@ void GUI::elements(const std::string& shadingMode) {
 
             // Spacing
             ImGui::Spacing();
+            ImGui::Checkbox("Hypsometric", &hypsometricPreview);
+
+            if(hypsometricPreview) {
+                ImGui::DragFloat("Base Height", (float*)&hypsometricHeight, sliderSpeed);
+                ImGui::SliderInt("Height Multiplier", (int*)&hypsometricHeightMultiplier, 1, 100);
+            }
+
+            // Spacing
+            ImGui::Spacing();
             if(ImGui::BeginTabBar("Object Properties")) {
                 if(ImGui::BeginTabItem("Material")) {
                     ImGui::DragFloat("Specular", (float*)&specular, sliderSpeed, 0.0f, 1.0f);

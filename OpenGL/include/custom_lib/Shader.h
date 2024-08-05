@@ -70,6 +70,7 @@ private:
            uniformDiffuseTexture, uniformAmbientOcclusionTexture, uniformSpecularTexture, uniformNormalTexture, uniformNoiseTexture,
            uniformEnvMapping, uniformSkybox, uniformBackgroundColor,
            uniformIsReflection, uniformIsRefraction, uniformIsNormal,
+           uniformIsHypsometricTint, uniformHypsometricHeight, uniformHypsometricMultiplier,
            uniformIOR, uniformFresnelReflectance, uniformDispersion,
            uniformNormalStrength, uniformSpecularStrength,
            uniformLandscapeHeight;
@@ -123,6 +124,9 @@ public:
     GLuint getEnvMappingLocation();
     GLuint getSkyboxLocation();
     GLuint getBackgroundColourLocation();
+    GLuint getIsHypsometricTintLocation();
+    GLuint getHypsometricHeightLocation();
+    GLuint getHypsometricMultiplierLocation();
 
     // Material Preview
     GLuint getMaterialPreviewLocation();

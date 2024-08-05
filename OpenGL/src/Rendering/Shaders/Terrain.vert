@@ -15,6 +15,9 @@ out vec3 Normal;
 // For specular
 out vec3 fragPos;
 
+// Passing height for hypsometric tint calculation in fragment shader
+out float vertexHeight;
+
 // MVP - Model, View, Projection Structure
 uniform mat4 model;
 uniform mat4 view;
@@ -32,6 +35,9 @@ void main() {
     gl_Position = projection * view * model * vec4(position, 1.0);
 
     col = vec4(clamp(position, 0.0f, 1.0f), 1.0f);
+
+    //*Cannot access gl_Position after it is set, because it is converted into Clip Space, which is not useable
+    vertexHeight = position.y;
 
     texCoord = tex;
 

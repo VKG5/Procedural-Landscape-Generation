@@ -12,6 +12,7 @@ Scene::Scene(Window& window)  :
                 uniformNoiseTexture(0),
                 uniformEnvMapping(0), uniformSkybox(0), uniformBackgroundColor(0),
                 uniformIsReflection(0), uniformIsRefraction(0), uniformIsNormal(0),
+                uniformIsHypsometricTint(0), uniformHypsometricHeight(0), uniformHypsometricMultiplier(0),
                 uniformIOR(0), uniformFresnelReflectance(0), uniformDispersion(0),
                 uniformNormalStrength(0), uniformSpecularStrength(0),
                 uniformLandscapeHeight(0),
@@ -83,17 +84,20 @@ void Scene::createTerrain(const char* heightmapLoc) {
             float v = static_cast<float>(i) / (height - 1);
 
             // Calculate normals using central difference
-            float leftHeight = getHeight(i - 1, j);
-            float rightHeight = getHeight(i + 1, j);
-            float downHeight = getHeight(i, j - 1);
-            float upHeight = getHeight(i, j + 1);
+            // float leftHeight = getHeight(i - 1, j);
+            // float rightHeight = getHeight(i + 1, j);
+            // float downHeight = getHeight(i, j - 1);
+            // float upHeight = getHeight(i, j + 1);
 
-            glm::vec3 left(-1.0f, leftHeight - vy, 0.0f);
-            glm::vec3 right(1.0f, rightHeight - vy, 0.0f);
-            glm::vec3 down(0.0f, downHeight - vy, -1.0f);
-            glm::vec3 up(0.0f, upHeight - vy, 1.0f);
+            // glm::vec3 left(-1.0f, leftHeight - vy, 0.0f);
+            // glm::vec3 right(1.0f, rightHeight - vy, 0.0f);
+            // glm::vec3 down(0.0f, downHeight - vy, -1.0f);
+            // glm::vec3 up(0.0f, upHeight - vy, 1.0f);
 
-            glm::vec3 normal = glm::normalize(cross(up, right) + glm::cross(right, down) + glm::cross(down, left) + glm::cross(left, up));
+            // glm::vec3 normal = glm::normalize(cross(up, right) + glm::cross(right, down) + glm::cross(down, left) + glm::cross(left, up));
+
+            // Passing empty normal
+            glm::vec3 normal = glm::vec3(0.0f, 0.0f, 1.0f);
 
             float Tx = 1.0f, Ty = 0.0f, Tz = 0.0f;
 
@@ -264,6 +268,11 @@ void Scene::getUniformsFromShader(Shader * shader) {
     uniformIsNormal = shader->getIsNormalLocation();
     uniformWireframeColor = shader->getWireframeColourLocation();
     uniformObjectColor = shader->getObjectColorLocation();
+    uniformIsHypsometricTint = shader->getIsHypsometricTintLocation();
+    uniformHypsometricHeight = shader->getHypsometricHeightLocation();
+    uniformHypsometricMultiplier = shader->getHypsometricMultiplierLocation();
+
+    // Environment settings
     uniformEnvMapping = shader->getEnvMappingLocation();
     uniformSkybox = shader->getSkyboxLocation();
     uniformBackgroundColor = shader->getBackgroundColourLocation();
@@ -328,6 +337,10 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
     glUniform1i(uniformIsWireframe, mainGUI.getIsWireframe());
     glUniform1i(uniformIsShaded, mainGUI.getIsShaded());
     glUniform1i(uniformIsNormal, mainGUI.getIsNormal());
+    glUniform1i(uniformIsHypsometricTint, mainGUI.getHysometricPreview());
+
+    glUniform1f(uniformHypsometricHeight, mainGUI.getHypsometricHeight());
+    glUniform1i(uniformHypsometricMultiplier, mainGUI.getHypsometricHeightMultiplier());
 
     glUniform4f(uniformObjectColor, mainGUI.getObjectColor().x,
                                     mainGUI.getObjectColor().y,

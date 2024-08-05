@@ -61,6 +61,7 @@ private:
     GLuint uniformNoiseTexture;
     GLuint uniformEnvMapping, uniformSkybox, uniformBackgroundColor;
     GLuint uniformIsReflection, uniformIsRefraction, uniformIsNormal;
+    GLuint uniformIsHypsometricTint, uniformHypsometricHeight, uniformHypsometricMultiplier;
     GLuint uniformIOR, uniformFresnelReflectance, uniformDispersion;
     GLuint uniformNormalStrength, uniformSpecularStrength;
     GLuint uniformLandscapeHeight;

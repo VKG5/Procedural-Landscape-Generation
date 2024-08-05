@@ -6,7 +6,7 @@ in vec4 geomCol;
 in vec2 geomTexCoord;
 in vec3 geomNormal;
 in vec3 geomFragPos;
-
+in float geomVertexHeight;
 
 // Output color========================================================================================================
 out vec4 outputColor;
@@ -54,11 +54,14 @@ struct Material {
 // Uniforms from C++===================================================================================================
 uniform vec4 objectColor;
 uniform vec4 wireframeColor;
+uniform float hypsometricHeight;
+uniform int hypsometricMultiplier;
 
 // Rendering Mode : Wireframe or Shaded
 uniform bool isWireframe;
 uniform bool isShaded;
 uniform bool isNormal;
+uniform bool isHypsometricTint;
 
 // Materials
 uniform Material material;
@@ -130,8 +133,37 @@ vec4 calcDirectionalLight() {
     return calcLightByDirection(directionalLight.base, directionalLight.direction);
 }
 
+// Function to calculate basic Hypsometric Tints
+vec4 getHypsometricTint() {
+    vec3 hypsometricColors = vec3(0.0, 0.0, 0.0);
+
+    // Define height levels and corresponding colors
+    if (geomVertexHeight < hypsometricHeight) {
+        hypsometricColors = vec3(0.2, 0.3, 0.1); // dark green
+    }
+
+    else if (geomVertexHeight < hypsometricHeight * hypsometricMultiplier) {
+        hypsometricColors = vec3(0.4, 0.6, 0.2); // green
+    }
+
+    else if (geomVertexHeight < hypsometricHeight * pow(hypsometricMultiplier, 2)) {
+        hypsometricColors = vec3(0.7, 0.8, 0.4); // light green
+    }
+
+    else if (geomVertexHeight < hypsometricHeight * pow(hypsometricMultiplier, 3)) {
+        hypsometricColors = vec3(0.8, 0.7, 0.5); // brownish
+    }
+
+    else {
+        hypsometricColors = vec3(1.0, 0.9, 0.8); // very light brown
+    }
+
+    return vec4(hypsometricColors, 1.0);
+}
+
 // Main Function=======================================================================================================
 void main() {
+    // Calculating normals dynamically
     float height = texture(diffuseMap, geomTexCoord).r;
     float heightRight = texture(diffuseMap, geomTexCoord + vec2(0.001, 0.0)).r;
     float heightUp = texture(diffuseMap, geomTexCoord + vec2(0.0, 0.001)).r;
@@ -153,10 +185,20 @@ void main() {
     else if(isNormal) {
         // Output normal as color
         outputColor = vec4(normal * 0.5 + 0.5, 1.0);
+        // outputColor = getHypsometricTint();
     }
 
     else {
         vec4 finalColour = calcDirectionalLight();
-        outputColor = objectColor * finalColour;
+
+        // Blinn-Phong with Hypsometric Tints
+        if(isHypsometricTint) {
+            outputColor = getHypsometricTint() * finalColour;
+        }
+
+        // Blinn-Phong with object color
+        else {
+            outputColor = objectColor * finalColour;
+        }
     }
 }

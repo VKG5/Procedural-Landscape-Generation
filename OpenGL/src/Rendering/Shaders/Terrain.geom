@@ -8,12 +8,14 @@ in vec4 col[];
 in vec2 texCoord[];
 in vec3 Normal[];
 in vec3 fragPos[];
+in float vertexHeight[];
 
 // Copying the input attributes to outputs as is
 out vec4 geomCol;
 out vec2 geomTexCoord;
 out vec3 geomNormal;
 out vec3 geomFragPos;
+out float geomVertexHeight;
 
 // To remove perspective correct interpolation, meaning the depth of the pixel is NOT taken into account (Linear Interpolation)
 // noperspective out vec3 edgeDistance;
@@ -26,9 +28,9 @@ uniform mat4 projection;
 void main() {
     // // Checking the distance from the pixel to an edge of a triangle, hence perspective correct project might break that
     // // Therefore, using Linear Interpolation
-    // vec4 p;
+    vec4 p;
 
-    // mat4 mvp = projection * view * model;
+    mat4 mvp = projection * view * model;
 
     // // Converting from NDC -> Screen Space Transformation
     // /*
@@ -120,6 +122,13 @@ void main() {
         // geomNormal = normal;
         geomNormal = Normal[i];
         geomFragPos = fragPos[i];
+
+        // Passing the height of the vertex
+        // | Clip Space -> NDC -> Screen Space |
+        // Clip Space position is available in gl_in array
+        // p = gl_in[1].gl_Position;
+        // vec2 p0 = vec2(mvp * (p / p.w));
+        geomVertexHeight = vertexHeight[i];
 
         // Emit the current vertex
         EmitVertex();
