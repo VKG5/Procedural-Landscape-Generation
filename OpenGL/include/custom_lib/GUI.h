@@ -39,7 +39,7 @@ private:
     // Light settings
     // Directional Light
     float directionalLightColor[3] = {1.0f, 1.0f, 1.0f};
-    float directionalLightDirection[3] = {2.0f, 1.0f, -2.0f};
+    float directionalLightDirection[3] = {2.0f, 1.0f, 1.0f};
     float directionalLightAmbient = 0.350f;
     float directionalLightDiffuse = 0.500f;
 
@@ -117,6 +117,9 @@ public:
     // Textures/Object Color
     bool getIsShaded() const { return shaded; }
     ImVec4 getObjectColor() const { return objectColor; }
+
+    // Normal Preview
+    bool getIsNormal() const { return normalPreview; }
 
     // Background Color
     ImVec4 getBackgroundColor() const { return bgColor; }

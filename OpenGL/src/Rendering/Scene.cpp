@@ -11,7 +11,8 @@ Scene::Scene(Window& window)  :
                 uniformDiffuseTexture(0), uniformAmbientOcclusionTexture(0), uniformSpecularTexture(0), uniformNormalTexture(0),
                 uniformNoiseTexture(0),
                 uniformEnvMapping(0), uniformSkybox(0), uniformBackgroundColor(0),
-                uniformIsReflection(0), uniformIsRefraction(0), uniformIOR(0), uniformFresnelReflectance(0), uniformDispersion(0),
+                uniformIsReflection(0), uniformIsRefraction(0), uniformIsNormal(0),
+                uniformIOR(0), uniformFresnelReflectance(0), uniformDispersion(0),
                 uniformNormalStrength(0), uniformSpecularStrength(0),
                 uniformLandscapeHeight(0),
                 mainWindow(window) {
@@ -260,6 +261,7 @@ void Scene::getUniformsFromShader(Shader * shader) {
     // Object Properties
     uniformIsShaded = shader->getIsShadedLocation();
     uniformIsWireframe = shader->getIsWireframeLocation();
+    uniformIsNormal = shader->getIsNormalLocation();
     uniformWireframeColor = shader->getWireframeColourLocation();
     uniformObjectColor = shader->getObjectColorLocation();
     uniformEnvMapping = shader->getEnvMappingLocation();
@@ -325,6 +327,7 @@ void Scene::setUniformsForShader(glm::mat4 projectionMatrix, glm::mat4 viewMatri
     // Object Properties
     glUniform1i(uniformIsWireframe, mainGUI.getIsWireframe());
     glUniform1i(uniformIsShaded, mainGUI.getIsShaded());
+    glUniform1i(uniformIsNormal, mainGUI.getIsNormal());
 
     glUniform4f(uniformObjectColor, mainGUI.getObjectColor().x,
                                     mainGUI.getObjectColor().y,

@@ -68,6 +68,7 @@ void Shader::compileProgram() {
     // Object Properties
     uniformIsShaded = glGetUniformLocation(shaderID, "isShaded");
     uniformIsWireframe = glGetUniformLocation(shaderID, "isWireframe");
+    uniformIsNormal = glGetUniformLocation(shaderID, "isNormal");
     uniformObjectColor = glGetUniformLocation(shaderID, "objectColor");
     uniformWireframeColor = glGetUniformLocation(shaderID, "wireframeColor");
 
@@ -338,6 +339,10 @@ GLuint Shader::getIsWireframeLocation() {
 
 GLuint Shader::getObjectColorLocation() {
     return uniformObjectColor;
+}
+
+GLuint Shader::getIsNormalLocation() {
+    return uniformIsNormal;
 }
 
 GLuint Shader::getWireframeColourLocation() {

@@ -65,8 +65,6 @@ void GUI::elements(const std::string& shadingMode) {
 
             //     // Put the next element on the same line
             //     ImGui::SameLine();
-
-            //     ImGui::Checkbox("Normal", &normalPreview);
             // }
 
             // File Path and Reload Terrain Button
@@ -101,12 +99,16 @@ void GUI::elements(const std::string& shadingMode) {
             // Spacing
             // You can also use - ImGui::Dummy(ImVec2(0.0f, 20.0f)); for custom height parameters (horizontal, vertical)
             ImGui::Spacing();
-            ImGui::Checkbox("Shaded", &shaded);
+            ImGui::Checkbox("Heightmap", &shaded);
 
             // Options based on wireframe
             if(!shaded) {
                 ImGui::ColorEdit4("Object Color", (float*)&objectColor);
             }
+
+            // Spacing
+            ImGui::Spacing();
+            ImGui::Checkbox("Normal", &normalPreview);
 
             // Spacing
             ImGui::Spacing();

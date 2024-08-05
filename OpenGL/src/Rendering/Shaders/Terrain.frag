@@ -58,6 +58,7 @@ uniform vec4 wireframeColor;
 // Rendering Mode : Wireframe or Shaded
 uniform bool isWireframe;
 uniform bool isShaded;
+uniform bool isNormal;
 
 // Materials
 uniform Material material;
@@ -80,6 +81,11 @@ uniform sampler2D diffuseMap;
 // Texture Unit 2
 // uniform sampler2D normalMap;
 
+
+// Global Variables
+vec3 normal;
+
+
 // Calculations========================================================================================================
 vec4 calcLightByDirection(Light light, vec3 direction) {
     // Ambient Light
@@ -87,7 +93,7 @@ vec4 calcLightByDirection(Light light, vec3 direction) {
 
     // Diffuse Light
     // Getting the cosine of angle between two vectors
-    float diffuseFactor = max(dot(normalize(geomNormal), normalize(direction)), 0.0);
+    float diffuseFactor = max(dot(normalize(normal), normalize(direction)), 0.0);
     vec4 diffuseColour = vec4(light.colour, 1.0)  * light.diffuseIntensity * diffuseFactor;
 
     // Specular Light
@@ -101,7 +107,7 @@ vec4 calcLightByDirection(Light light, vec3 direction) {
         vec3 fragToEye = normalize(eyePosition - geomFragPos);
         vec3 halfwayDir = normalize(fragToLight + fragToEye);
 
-        specularFactor = max(dot(halfwayDir, normalize(geomNormal)), 0.0);
+        specularFactor = max(dot(halfwayDir, normalize(normal)), 0.0);
 
         // Clamping and specular highlights
         if (specularFactor > 0.0) {
@@ -126,12 +132,27 @@ vec4 calcDirectionalLight() {
 
 // Main Function=======================================================================================================
 void main() {
+    float height = texture(diffuseMap, geomTexCoord).r;
+    float heightRight = texture(diffuseMap, geomTexCoord + vec2(0.001, 0.0)).r;
+    float heightUp = texture(diffuseMap, geomTexCoord + vec2(0.0, 0.001)).r;
+
+    vec3 va = normalize(vec3(1.0, 0.0, (heightRight - height) * 100.0));
+    vec3 vb = normalize(vec3(0.0, 1.0, (heightUp - height) * 100.0));
+
+    // vec3 normal = cross(va, vb);
+    normal = cross(va, vb);
+
     if(isWireframe) {
         outputColor = wireframeColor;
     }
 
     else if(isShaded) {
         outputColor = texture(diffuseMap, geomTexCoord);
+    }
+
+    else if(isNormal) {
+        // Output normal as color
+        outputColor = vec4(normal * 0.5 + 0.5, 1.0);
     }
 
     else {

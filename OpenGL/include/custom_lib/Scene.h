@@ -60,7 +60,8 @@ private:
     GLuint uniformDiffuseTexture, uniformAmbientOcclusionTexture, uniformSpecularTexture, uniformNormalTexture;
     GLuint uniformNoiseTexture;
     GLuint uniformEnvMapping, uniformSkybox, uniformBackgroundColor;
-    GLuint uniformIsReflection, uniformIsRefraction, uniformIOR, uniformFresnelReflectance, uniformDispersion;
+    GLuint uniformIsReflection, uniformIsRefraction, uniformIsNormal;
+    GLuint uniformIOR, uniformFresnelReflectance, uniformDispersion;
     GLuint uniformNormalStrength, uniformSpecularStrength;
     GLuint uniformLandscapeHeight;
 

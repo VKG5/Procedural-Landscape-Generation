@@ -69,7 +69,8 @@ private:
            uniformMaterialPreview, uniformSpecularPreview, uniformNormalPreview,
            uniformDiffuseTexture, uniformAmbientOcclusionTexture, uniformSpecularTexture, uniformNormalTexture, uniformNoiseTexture,
            uniformEnvMapping, uniformSkybox, uniformBackgroundColor,
-           uniformIsReflection, uniformIsRefraction, uniformIOR, uniformFresnelReflectance, uniformDispersion,
+           uniformIsReflection, uniformIsRefraction, uniformIsNormal,
+           uniformIOR, uniformFresnelReflectance, uniformDispersion,
            uniformNormalStrength, uniformSpecularStrength,
            uniformLandscapeHeight;
 
@@ -116,6 +117,7 @@ public:
     // Object Properties
     GLuint getIsShadedLocation();
     GLuint getIsWireframeLocation();
+    GLuint getIsNormalLocation();
     GLuint getObjectColorLocation();
     GLuint getWireframeColourLocation();
     GLuint getEnvMappingLocation();
