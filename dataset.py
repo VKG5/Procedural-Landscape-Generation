@@ -227,4 +227,4 @@ def generateData(southBound = 26.0, northBound = 30.0, eastBound = 90.0, westBou
 #                 East: 179.000138888889°     
 #                 West: -179.000138888889°
 # A higer patch size : 5, requires a lot of memory. 24 GB was not enough for this
-generateData(southBound = 26.0, northBound = 36.0, eastBound = 92.0, westBound = 77.0, saveImage=True, viewImage=False, isPatch=True, pSize=2.5)
+generateData(southBound = 26.0, northBound = 36.0, eastBound = 92.0, westBound = 77.0, saveImage=True, viewImage=False, isPatch=True, pSize=3.0)

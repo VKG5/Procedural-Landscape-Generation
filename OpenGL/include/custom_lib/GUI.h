@@ -59,20 +59,12 @@ private:
     float cameraOrthoScale = 7.135f;
     float cameraNearClipping = 0.1f;
     float cameraFarClipping = 1500.0f;
-    float cameraSpeed = 15.0f;
+    float cameraSpeed = 35.0f;
     float cameraPos[3] = {465.0f, 218.2f, 465.0f};
     bool isCameraRotate = false;
     float cameraRotateRadius = 10.0f;
     float cameraRotateSpeed = 1.0f;
 
-    // Anaglyph
-    bool isAnaglyph = false;
-    bool isToedIn = false;
-    bool isFlipAnaglyphChannelsToed = true;
-    bool isFlipAnaglyphChannelsFrustum = false;
-    bool isAsymmetricFrustum = false;
-    float interOcularDistance = 0.065f;
-    float convergeDistance = 2.0f;
 
     // Skybox
     bool isSkyBox = false;
